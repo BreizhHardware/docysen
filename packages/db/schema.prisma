@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  student
+  moderator
+  admin
+}
+
+model User {
+  id       String   @id @default(uuid())
+  aurionId String   @unique // login WebAurion, jamais le mot de passe
+  email    String   @unique // email ISEN construit depuis le nom WebAurion (aurionEmail)
+
+  firstName String
+  lastName  String
+  role      UserRole @default(student)
+
+  // Opt-in : adresse utilisée pour les notifications (rejet de document, etc.).
+  // null tant que l'étudiant n'a pas donné son consentement lors du premier login.
+  notificationEmail String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

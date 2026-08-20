@@ -1,0 +1,14 @@
+{
+  "name": "db",
+  "sourceRoot": "packages/db/src",
+  "targets": {
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run generate", "cwd": "packages/db" }
+    },
+    "migrate-dev": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run migrate:dev", "cwd": "packages/db" }
+    }
+  }
+}

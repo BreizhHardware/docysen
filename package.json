@@ -1,0 +1,25 @@
+{
+  "name": "docysen",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nx run-many -t dev --parallel",
+    "build": "nx run-many -t build",
+    "test": "nx run-many -t test",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "graph": "nx graph"
+  },
+  "devDependencies": {
+    "@nx/js": "^23.1.1",
+    "nx": "^23.1.1",
+    "oxfmt": "^0.64.0",
+    "oxlint": "^1.79.0",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.nx/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+apps/frontend/.vite/
+packages/db/generated/
+**/tsconfig.tsbuildinfo
+
+Plan.md

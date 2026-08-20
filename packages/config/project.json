@@ -1,0 +1,5 @@
+{
+  "name": "config",
+  "sourceRoot": "packages/config/src",
+  "targets": {}
+}

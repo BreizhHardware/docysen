@@ -1,0 +1,35 @@
+{
+  "name": "@docysen/auth-service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/main.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@docysen/config": "workspace:*",
+    "@docysen/db": "workspace:*",
+    "@docysen/types": "workspace:*",
+    "@docysen/utils": "workspace:*",
+    "@fastify/cors": "^11.3.0",
+    "@fastify/rate-limit": "^11.2.0",
+    "axios": "^1.19.0",
+    "axios-cookiejar-support": "^7.0.0",
+    "cheerio": "^1.2.0",
+    "fastify": "^5.12.1",
+    "fastify-plugin": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "tough-cookie": "^6.0.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.2.0",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

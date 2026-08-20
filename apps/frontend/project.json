@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "sourceRoot": "apps/frontend/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run dev", "cwd": "apps/frontend" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run build", "cwd": "apps/frontend" }
+    }
+  }
+}

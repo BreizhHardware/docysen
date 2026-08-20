@@ -1,0 +1,22 @@
+{
+  "name": "auth-service",
+  "sourceRoot": "apps/auth-service/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run dev", "cwd": "apps/auth-service" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run build", "cwd": "apps/auth-service" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run test", "cwd": "apps/auth-service" }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "docker build -t docysen/auth-service .", "cwd": "apps/auth-service" }
+    }
+  }
+}

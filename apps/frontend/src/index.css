@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Palette inspirée de l'UI de Paperless-ngx : sidebar bleu-nuit, accent teal.
+   Tailwind v4 : customisation du thème via CSS plutôt que tailwind.config.js. */
+@theme {
+  --color-sidebar: #1e2b3a;
+  --color-sidebar-hover: #28394c;
+  --color-sidebar-active: #2f4258;
+
+  --color-accent: #1c9c8e;
+  --color-accent-hover: #17847a;
+  --color-accent-light: #e4f5f3;
+
+  --color-surface: #f3f5f7;
+}
+
+body {
+  @apply bg-surface text-slate-800 antialiased;
+}
