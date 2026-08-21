@@ -1,0 +1,28 @@
+info:
+  name: Set Notification Email
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: "{{authServiceUrl}}/users/me/notification-email"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{token}}"
+  body:
+    type: json
+    data: |-
+      {
+        "optIn": true,
+        "email": "ton.email@example.com"
+      }
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Consentement opt-in pour l'email de notification (rejet de document, etc.).
+  Pour désactiver : { "optIn": false } (pas de champ "email").

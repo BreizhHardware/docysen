@@ -4,6 +4,7 @@ import { useAuth } from "./context/AuthContext";
 import AppLayout from "./components/AppLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import UploadDocument from "./pages/UploadDocument";
 
 function RequireAuth({ children }: { children: ReactElement }) {
   const { token } = useAuth();
@@ -24,6 +25,7 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="documents/new" element={<UploadDocument />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

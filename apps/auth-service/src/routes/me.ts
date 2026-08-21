@@ -11,7 +11,7 @@ export default async function meRoutes(fastify: FastifyInstance) {
 
     return reply.send({
       userId: user.aurionId,
-      email: user.email,
+      email: user.aurionEmail,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,

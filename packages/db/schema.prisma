@@ -13,19 +13,109 @@ enum UserRole {
   admin
 }
 
+enum DocumentStatus {
+  pending
+  approved
+  rejected
+}
+
+enum ModerationAction {
+  approved
+  rejected
+}
+
 model User {
-  id       String   @id @default(uuid())
-  aurionId String   @unique // login WebAurion, jamais le mot de passe
-  email    String   @unique // email ISEN construit depuis le nom WebAurion (aurionEmail)
+  id          String @id @default(uuid())
+  aurionId    String @unique // login WebAurion, jamais le mot de passe
+  aurionEmail String @unique // email ISEN construit depuis le nom WebAurion, usage interne/affichage (anciennement `email`)
 
   firstName String
   lastName  String
   role      UserRole @default(student)
 
-  // Opt-in : adresse utilisée pour les notifications (rejet de document, etc.).
+  // Opt-in : adresse utilisée pour les notifications (rejet de document, etc.), distincte de aurionEmail.
   // null tant que l'étudiant n'a pas donné son consentement lors du premier login.
   notificationEmail String?
 
+  documents        Document[]
+  moderationEvents ModerationEvent[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Promo {
+  id        String   @id @default(uuid())
+  label     String   @unique // ex: "ISEN Ouest 2027"
+  semesters String[] // ex: ["S1", "S2", "S3", ...]
+
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id String @id @default(uuid())
+
+  title   String
+  subject String
+  docType String
+
+  promoId  String
+  promo    Promo  @relation(fields: [promoId], references: [id])
+  semester String
+
+  fileName String
+  mimeType String
+  fileSize Int
+  s3Key    String @unique // clé de l'objet dans le bucket Garage (dev) / S3 (prod)
+
+  status  DocumentStatus @default(pending)
+  ocrText String?
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  tags             DocumentTag[]
+  moderationEvents ModerationEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([promoId, semester])
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  label String @unique
+
+  documents DocumentTag[]
+}
+
+model DocumentTag {
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  tagId      String
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([documentId, tagId])
+}
+
+model ModerationEvent {
+  id String @id @default(uuid())
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+
+  moderatorId String
+  moderator   User   @relation(fields: [moderatorId], references: [id])
+
+  action ModerationAction
+  reason String?
+
+  createdAt DateTime @default(now())
+
+  @@index([documentId])
 }

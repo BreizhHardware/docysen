@@ -1,0 +1,39 @@
+info:
+  name: Create Document
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{apiServiceUrl}}/documents"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{token}}"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "TD1 Réseaux",
+        "subject": "Réseaux",
+        "docType": "td",
+        "promoId": "{{promoId}}",
+        "semester": "S1",
+        "fileName": "td1.pdf",
+        "mimeType": "application/pdf",
+        "fileSize": 12345
+      }
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Crée le document en base (status "pending") et retourne une `uploadUrl` présignée (300s) :
+  le fichier lui-même s'uploade ensuite en PUT direct vers cette URL, hors de cette collection
+  (voir @docysen/utils s3.ts / packages/utils/tests/s3.test.ts pour un exemple de PUT réel).
+
+  {{promoId}} est rempli automatiquement par "Create Promo" ; sinon copie un id depuis
+  "List Promos" et colle-le à la main. `semester` doit faire partie des semestres de la promo
+  choisie (sinon 400 "Semestre inconnu pour cette promo").

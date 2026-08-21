@@ -1,0 +1,22 @@
+{
+  "name": "api-service",
+  "sourceRoot": "apps/api-service/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run dev", "cwd": "apps/api-service" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run build", "cwd": "apps/api-service" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run test", "cwd": "apps/api-service" }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "docker build -t docysen/api-service .", "cwd": "apps/api-service" }
+    }
+  }
+}

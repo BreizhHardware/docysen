@@ -1,0 +1,25 @@
+name: Local
+variables:
+  - name: authServiceUrl
+    value: http://localhost:3001
+    description: auth-service (login, profil)
+
+  - name: apiServiceUrl
+    value: http://localhost:3002
+    description: api-service (documents, promos)
+
+  - name: username
+    value: ""
+    description: Identifiant WebAurion (login)
+
+  - name: promoId
+    value: ""
+    description: Rempli automatiquement par "Create Promo" (script after-response) pour "Create Document"
+
+  - secret: true
+    name: password
+    description: Mot de passe WebAurion
+    
+  - secret: true
+    name: token
+    description: Rempli automatiquement par "Login" (script after-response), pas besoin d'y toucher

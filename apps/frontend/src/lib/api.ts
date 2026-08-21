@@ -1,6 +1,13 @@
-import type { LoginResponse } from "@docysen/types";
+import type {
+  CreateDocumentBody,
+  CreateDocumentResponse,
+  LoginResponse,
+  PromoSummary,
+} from "@docysen/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001";
+// api-service est un service séparé de auth-service (voir Plan.md phase 2), pas juste une autre route.
+const API_SERVICE_BASE_URL = import.meta.env.VITE_API_SERVICE_BASE_URL ?? "http://localhost:3002";
 
 export class ApiError extends Error {
   constructor(
@@ -26,6 +33,39 @@ export function login(username: string, password: string): Promise<LoginResponse
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   }).then((res) => handle<LoginResponse>(res));
+}
+
+export function getPromos(token: string): Promise<PromoSummary[]> {
+  return fetch(`${API_SERVICE_BASE_URL}/promos`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle<PromoSummary[]>(res));
+}
+
+/** Crée le document en base (status "pending") et retourne une URL présignée pour l'upload direct. */
+export function createDocument(
+  token: string,
+  body: CreateDocumentBody,
+): Promise<CreateDocumentResponse> {
+  return fetch(`${API_SERVICE_BASE_URL}/documents`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body),
+  }).then((res) => handle<CreateDocumentResponse>(res));
+}
+
+/** Upload direct du fichier vers Garage/S3 via l'URL présignée, ne passe jamais par nos services. */
+export async function uploadToPresignedUrl(uploadUrl: string, file: File): Promise<void> {
+  const res = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+  if (!res.ok) {
+    throw new ApiError("Échec de l'upload du fichier, réessaie.", res.status);
+  }
 }
 
 export function setNotificationEmail(

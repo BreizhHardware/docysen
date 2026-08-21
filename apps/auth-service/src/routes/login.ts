@@ -39,15 +39,15 @@ export default async function loginRoutes(fastify: FastifyInstance) {
 
     const user = await fastify.prisma.user.upsert({
       where: { aurionId: username },
-      create: { aurionId: username, email, firstName, lastName },
+      create: { aurionId: username, aurionEmail: email, firstName, lastName },
       // On ne touche pas à `notificationEmail` ici : c'est un choix explicite de l'utilisateur (voir routes/me.ts),
       // pas quelque chose qu'on doit réécrire à chaque connexion.
-      update: { email, firstName, lastName },
+      update: { aurionEmail: email, firstName, lastName },
     });
 
     const payload: Omit<JwtPayload, "iat" | "exp"> = {
       userId: user.aurionId,
-      email: user.email,
+      email: user.aurionEmail,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
@@ -62,7 +62,7 @@ export default async function loginRoutes(fastify: FastifyInstance) {
       token,
       user: {
         userId: user.aurionId,
-        email: user.email,
+        email: user.aurionEmail,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,

@@ -1,0 +1,42 @@
+info:
+  name: Create Promo
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: "{{apiServiceUrl}}/promos"
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "label": "ISEN Ouest 2027",
+        "semesters": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9"]
+      }
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201) {
+          bru.setVar("promoId", res.body.id);
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+docs: |-
+  Réservé admin/modérateur (403 sinon).
+  Par défaut les comptes de test ne sont pas admin, pour les passer en "admin" il faut le faire via SQL :
+    UPDATE "User" SET role='admin' WHERE "aurionId"='<ton login WebAurion>';
+  409 si une promo avec ce label existe déjà.
