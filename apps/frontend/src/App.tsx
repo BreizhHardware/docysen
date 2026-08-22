@@ -5,6 +5,9 @@ import AppLayout from "./components/AppLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import UploadDocument from "./pages/UploadDocument";
+import Documents from "./pages/Documents";
+import Moderation from "./pages/Moderation";
+import Search from "./pages/Search";
 
 function RequireAuth({ children }: { children: ReactElement }) {
   const { token } = useAuth();
@@ -25,7 +28,10 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="documents" element={<Documents />} />
         <Route path="documents/new" element={<UploadDocument />} />
+        <Route path="moderation" element={<Moderation />} />
+        <Route path="search" element={<Search />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

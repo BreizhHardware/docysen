@@ -32,6 +32,20 @@ services:
       - garage-data:/data/data
       - ./infra/garage.toml:/etc/garage.toml
 
+  # Optionnel en dev : `nx dev thumbnail-worker` (venv local, voir apps/thumbnail-worker/README.md)
+  # est plus rapide à itérer dessus que de reconstruire l'image à chaque changement de code.
+  thumbnail-worker:
+    build:
+      context: .
+      dockerfile: apps/thumbnail-worker/Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://garage:3900
+    depends_on:
+      - redis
+      - garage
+
 volumes:
   postgres-data:
   garage-meta:

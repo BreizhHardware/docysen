@@ -1,0 +1,25 @@
+info:
+  name: Moderation Queue
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: "{{apiServiceUrl}}/moderation/queue"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 200 && res.body.length > 0) {
+          bru.setVar("documentId", res.body[0].id);
+        }
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Réservé admin/modérateur (403 sinon). Documents "pending" uniquement.

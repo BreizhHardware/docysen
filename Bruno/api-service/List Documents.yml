@@ -1,0 +1,17 @@
+info:
+  name: List Documents
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{apiServiceUrl}}/documents"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Étudiant : ses propres documents. Admin/modérateur : tous les documents.

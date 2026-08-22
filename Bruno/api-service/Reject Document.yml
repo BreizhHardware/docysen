@@ -1,0 +1,27 @@
+info:
+  name: Reject Document
+  type: http
+  seq: 8
+
+http:
+  method: PATCH
+  url: "{{apiServiceUrl}}/moderation/{{documentId}}/reject"
+  headers:
+    - name: Content-Type
+      value: application/json
+  auth:
+    type: bearer
+    token: "{{token}}"
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "Scan illisible, merci de renvoyer une version plus nette."
+      }
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Réservé admin/modérateur. `reason` obligatoire, 10-500 caractères. 409 si le document n'est
+  plus "pending". {{documentId}} rempli automatiquement par "Moderation Queue".

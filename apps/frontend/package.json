@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@docysen/types": "workspace:*",
+    "dompurify": "^3.2.4",
+    "marked": "^15.0.7",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",

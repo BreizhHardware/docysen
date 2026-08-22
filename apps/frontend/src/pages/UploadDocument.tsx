@@ -2,10 +2,9 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { MAX_UPLOAD_SIZE_BYTES } from "@docysen/types";
 import type { PromoSummary } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
-import { createDocument, getPromos, uploadToPresignedUrl } from "../lib/api";
+import { confirmUpload, createDocument, getPromos, uploadToPresignedUrl } from "../lib/api";
 
-// Types de document ISEN courants ; jamais illustré/étendu automatiquement (contrairement à
-// KNOWN_SUBJECTS côté tagging, phase 5), une simple liste fixe suffit ici.
+// Types de document ISEN courants ; jamais illustré/étendu automatiquement, une simple liste fixe suffit ici.
 const DOC_TYPE_OPTIONS = [
   { value: "cours", label: "Cours" },
   { value: "td", label: "TD" },
@@ -43,15 +42,14 @@ export default function UploadDocument() {
 
   const selectedPromo = promos.find((promo) => promo.id === promoId);
 
-  // Pas de valeur par défaut devinée : promo/semestre doivent être choisis explicitement
-  // (voir décisions ajoutées à la spec initiale), la soumission reste bloquée sans ça.
+  // Pas de valeur par défaut devinée : promo/semestre doivent être choisis explicitement, la soumission reste bloquée sans ça.
   const canSubmit = Boolean(
     token && title && subject && docType && promoId && semester && file && !submitting,
   );
 
   function handlePromoChange(value: string) {
     setPromoId(value);
-    setSemester(""); // le semestre dépend de la promo choisie, on ne garde pas un choix devenu invalide
+    setSemester("");
   }
 
   function handleFileChange(selected: File | null) {
@@ -71,7 +69,7 @@ export default function UploadDocument() {
     setSubmitting(true);
     setError(null);
     try {
-      const { uploadUrl } = await createDocument(token, {
+      const { documentId, uploadUrl } = await createDocument(token, {
         title,
         subject,
         docType,
@@ -82,6 +80,9 @@ export default function UploadDocument() {
         fileSize: file.size,
       });
       await uploadToPresignedUrl(uploadUrl, file);
+      // Déclenche la génération de miniature : pas bloquant pour
+      // l'utilisateur si ça échoue, le document reste utilisable sans miniature (fallback icône).
+      confirmUpload(token, documentId).catch(() => {});
       setSuccess(true);
       setTitle("");
       setSubject("");

@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export interface S3ClientConfig {
@@ -42,5 +42,24 @@ export async function getPresignedUploadUrl(
     ContentType: request.contentType,
     ContentLength: request.contentLength,
   });
+  return getSignedUrl(client, command, { expiresIn });
+}
+
+export interface PresignedDownloadRequest {
+  bucket: string;
+  key: string;
+  expiresInSeconds?: number;
+}
+
+// Plus courte que l'upload (PresignedUploadRequest) : une URL de consultation ne doit pas rester
+// valide longtemps une fois affichée dans le navigateur
+const DEFAULT_DOWNLOAD_EXPIRES_IN_SECONDS = 60;
+
+export async function getPresignedDownloadUrl(
+  client: S3Client,
+  request: PresignedDownloadRequest,
+): Promise<string> {
+  const expiresIn = request.expiresInSeconds ?? DEFAULT_DOWNLOAD_EXPIRES_IN_SECONDS;
+  const command = new GetObjectCommand({ Bucket: request.bucket, Key: request.key });
   return getSignedUrl(client, command, { expiresIn });
 }

@@ -1,0 +1,17 @@
+info:
+  name: Moderation History
+  type: http
+  seq: 9
+
+http:
+  method: GET
+  url: "{{apiServiceUrl}}/moderation/{{documentId}}/history"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Accessible au modérateur/admin ou à l'auteur du document (pour voir le motif d'un rejet).

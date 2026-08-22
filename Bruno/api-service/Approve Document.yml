@@ -1,0 +1,18 @@
+info:
+  name: Approve Document
+  type: http
+  seq: 7
+
+http:
+  method: PATCH
+  url: "{{apiServiceUrl}}/moderation/{{documentId}}/approve"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Réservé admin/modérateur. 409 si le document n'est plus "pending".
+  {{documentId}} rempli automatiquement par "Moderation Queue".

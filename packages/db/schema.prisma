@@ -74,6 +74,14 @@ model Document {
   status  DocumentStatus @default(pending)
   ocrText String?
 
+  // Clé S3 de la miniature, null tant que le thumbnail-worker (déclenché après confirmation d'upload) ne l'a pas générée
+  thumbnailKey String?
+
+  // Clé S3 de la version PDF convertie par LibreOffice headless, générée par le même thumbnail-worker et servie pour la
+  // consultation dans le navigateur à la place du fichier original
+  // Null pour tous les autres types, qui se prévisualisent directement depuis `s3Key`.
+  previewKey String?
+
   uploadedById String
   uploadedBy   User   @relation(fields: [uploadedById], references: [id])
 

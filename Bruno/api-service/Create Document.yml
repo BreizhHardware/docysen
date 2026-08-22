@@ -26,6 +26,14 @@ http:
         "fileSize": 12345
       }
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status === 201) {
+          bru.setVar("documentId", res.body.documentId);
+        }
+
 settings:
   encodeUrl: true
 
@@ -33,6 +41,8 @@ docs: |-
   Crée le document en base (status "pending") et retourne une `uploadUrl` présignée (300s) :
   le fichier lui-même s'uploade ensuite en PUT direct vers cette URL, hors de cette collection
   (voir @docysen/utils s3.ts / packages/utils/tests/s3.test.ts pour un exemple de PUT réel).
+  `fileSize` doit correspondre à la taille réelle du fichier uploadé ensuite (le presign en
+  Content-Length fait partie de la signature, un écart fait échouer le PUT en 403).
 
   {{promoId}} est rempli automatiquement par "Create Promo" ; sinon copie un id depuis
   "List Promos" et colle-le à la main. `semester` doit faire partie des semestres de la promo

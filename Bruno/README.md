@@ -18,16 +18,22 @@ Ouvre ce dossier (`Bruno/`) comme collection dans [Bruno](https://www.usebruno.c
   UPDATE "User" SET role='admin' WHERE "aurionId"='<login WebAurion>';
   ```
 - **Create Document** ne fait que créer le document (`status: pending`) et renvoyer une `uploadUrl` présignée, l'upload du fichier lui-même (PUT direct vers Garage/S3) n'est pas couvert par cette collection, voir `packages/utils/tests/s3.test.ts` pour un exemple.
+- **Moderation Queue** remplit automatiquement `{{documentId}}` (1er document de la file), réutilisé par **Approve Document** / **Reject Document** / **Moderation History**. Un admin/modérateur peut modérer n'importe quel document, y compris les siens.
 
 ## Routes couvertes
 
-| Dossier        | Requête                              | Notes                       |
-| -------------- | ------------------------------------ | --------------------------- |
-| `auth-service` | `GET /health`                        |                             |
-| `auth-service` | `POST /auth/login`                   |                             |
-| `auth-service` | `GET /users/me`                      | JWT requis                  |
-| `auth-service` | `PATCH /users/me/notification-email` | JWT requis                  |
-| `api-service`  | `GET /health`                        |                             |
-| `api-service`  | `GET /promos`                        | JWT requis                  |
-| `api-service`  | `POST /promos`                       | JWT + rôle admin/modérateur |
-| `api-service`  | `POST /documents`                    | JWT requis                  |
+| Dossier        | Requête                              | Notes                                                       |
+| -------------- | ------------------------------------ | ----------------------------------------------------------- |
+| `auth-service` | `GET /health`                        |                                                             |
+| `auth-service` | `POST /auth/login`                   |                                                             |
+| `auth-service` | `GET /users/me`                      | JWT requis                                                  |
+| `auth-service` | `PATCH /users/me/notification-email` | JWT requis                                                  |
+| `api-service`  | `GET /health`                        |                                                             |
+| `api-service`  | `GET /promos`                        | JWT requis                                                  |
+| `api-service`  | `POST /promos`                       | JWT + rôle admin/modérateur                                 |
+| `api-service`  | `POST /documents`                    | JWT requis                                                  |
+| `api-service`  | `GET /documents`                     | JWT requis (étudiant : les siens ; admin/modérateur : tous) |
+| `api-service`  | `GET /moderation/queue`              | JWT + rôle admin/modérateur                                 |
+| `api-service`  | `PATCH /moderation/:id/approve`      | JWT + rôle admin/modérateur                                 |
+| `api-service`  | `PATCH /moderation/:id/reject`       | JWT + rôle admin/modérateur                                 |
+| `api-service`  | `GET /moderation/:id/history`        | JWT requis (auteur ou admin/modérateur)                     |

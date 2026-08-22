@@ -1,0 +1,23 @@
+info:
+  name: Confirm Upload
+  type: http
+  seq: 10
+
+http:
+  method: POST
+  url: "{{apiServiceUrl}}/documents/{{documentId}}/confirm-upload"
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+
+docs: |-
+  Réservé au déposant du document. À appeler une fois le PUT vers `uploadUrl` (voir "Create
+  Document") terminé avec succès : déclenche la génération de miniature côté thumbnail-worker
+  (queue BullMQ "thumbnails"). Renvoie 202 immédiatement, la génération est asynchrone — relance
+  "List Documents" un peu plus tard pour voir la miniature apparaître dans les résultats de
+  recherche (`GET /search`) ou la file de modération.
+
+  {{documentId}} rempli automatiquement par "Create Document".

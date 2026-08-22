@@ -10,5 +10,9 @@ coverage/
 apps/frontend/.vite/
 packages/db/generated/
 **/tsconfig.tsbuildinfo
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
 
 Plan.md

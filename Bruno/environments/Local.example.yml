@@ -16,10 +16,14 @@ variables:
     value: ""
     description: Rempli automatiquement par "Create Promo" (script after-response) pour "Create Document"
 
+  - name: documentId
+    value: ""
+    description: Rempli automatiquement par "Moderation Queue" (1er document de la file) pour Approve/Reject/History
+
   - secret: true
     name: password
     description: Mot de passe WebAurion
-    
+
   - secret: true
     name: token
     description: Rempli automatiquement par "Login" (script after-response), pas besoin d'y toucher

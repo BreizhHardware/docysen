@@ -19,5 +19,6 @@
   "affected": {
     "defaultBase": "main"
   },
+  "parallel": 8,
   "analytics": false
 }

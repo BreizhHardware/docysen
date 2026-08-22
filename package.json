@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "nx run-many -t dev --parallel",
+    "dev": "nx run-many -t dev --parallel=8",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
     "lint": "oxlint .",

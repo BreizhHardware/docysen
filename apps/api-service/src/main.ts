@@ -3,8 +3,12 @@ import cors from "@fastify/cors";
 import { env } from "./env.js";
 import prismaPlugin from "./plugins/prisma.js";
 import s3Plugin from "./plugins/s3.js";
+import meilisearchPlugin from "./plugins/meilisearch.js";
+import queuePlugin from "./plugins/queue.js";
 import documentRoutes from "./routes/documents.js";
 import promoRoutes from "./routes/promos.js";
+import moderationRoutes from "./routes/moderation.js";
+import searchRoutes from "./routes/search.js";
 
 const fastify = Fastify({
   logger: {
@@ -23,8 +27,12 @@ await fastify.register(cors, {
 
 await fastify.register(prismaPlugin);
 await fastify.register(s3Plugin);
+await fastify.register(meilisearchPlugin);
+await fastify.register(queuePlugin);
 await fastify.register(documentRoutes);
 await fastify.register(promoRoutes);
+await fastify.register(moderationRoutes);
+await fastify.register(searchRoutes);
 
 fastify.get("/health", async () => ({ status: "ok" }));
 

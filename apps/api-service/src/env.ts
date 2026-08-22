@@ -14,6 +14,11 @@ export const ApiServiceEnvSchema = BaseEnvSchema.extend({
   S3_BUCKET: z.string().min(1),
   // Absent en prod (AWS S3 réel), pointe vers Garage en dev.
   S3_ENDPOINT: z.url().optional(),
+  // Réseau interne uniquement (K8s), jamais exposé publiquement
+  MEILISEARCH_URL: z.url(),
+  MEILISEARCH_KEY: z.string().min(1),
+  // File BullMQ "thumbnails" (producteur ici, consommateur côté thumbnail-worker Python).
+  REDIS_URL: z.url().default("redis://localhost:6379"),
 });
 export type ApiServiceEnv = z.infer<typeof ApiServiceEnvSchema>;
 
