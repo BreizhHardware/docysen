@@ -12,14 +12,12 @@ Plateforme de dépôt et consultation de documents de cours par les étudiants p
 
 ```bash
 cp .env.example .env
-docker compose up -d postgres garage
+docker compose up -d
 pnpm install
 pnpm --filter @docysen/db run generate
 pnpm --filter @docysen/db run migrate:dev
 ./infra/garage-init.sh
-pnpm --filter @docysen/auth-service run dev    # http://localhost:3001
-pnpm --filter @docysen/api-service run dev     # http://localhost:3002
-pnpm --filter @docysen/frontend run dev        # http://localhost:5173
+pnpm dev # lance tous les services (auth-service, api-service, frontend) en parallèle (frontend sur http://localhost:5173, auth-service sur http://localhost:3001, api-service sur http://localhost:3002)
 ```
 
 `infra/garage-init.sh` affiche un `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` générés à la création de la clé : à reporter dans ton `.env` (Garage ne les connaît pas à l'avance, contrairement aux clés `dev-key`/`dev-secret` de `.env.example` qui ne sont que des placeholders).
