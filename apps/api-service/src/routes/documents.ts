@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { randomUUID } from "node:crypto";
 import {
   CreateDocumentSchema,
+  OcrJobSchema,
   ThumbnailJobSchema,
   type CreateDocumentResponse,
   type DocumentSummary,
@@ -10,7 +11,7 @@ import {
 import { getPresignedDownloadUrl, getPresignedUploadUrl } from "@docysen/utils";
 import { requireAuth } from "../middleware/auth.js";
 import { toDocumentSummary } from "../lib/documentSummary.js";
-import { THUMBNAILS_QUEUE } from "../plugins/queue.js";
+import { PROCESSING_QUEUE, THUMBNAILS_QUEUE } from "../plugins/queue.js";
 import { env } from "../env.js";
 
 // Caractères hors [a-zA-Z0-9._-] proscrits dans une clé S3/Garage sans encodage supplémentaire.
@@ -105,8 +106,8 @@ export default async function documentRoutes(fastify: FastifyInstance) {
 
   /**
    * Appelé par le frontend une fois le PUT vers l'URL présignée terminé avec succès : déclenche
-   * la génération de miniature (queue BullMQ "thumbnails", voir plugins/queue.ts). Réservé au
-   * déposant : personne d'autre ne sait quand son propre upload s'est terminé.
+   * en parallèle la génération de miniature (queue BullMQ "thumbnails") et l'extraction de texte
+   * (queue "processing").
    */
   fastify.post(
     "/documents/:id/confirm-upload",
@@ -123,13 +124,16 @@ export default async function documentRoutes(fastify: FastifyInstance) {
         return reply.status(403).send({ error: "Accès réservé au déposant du document" });
       }
 
-      const job = ThumbnailJobSchema.parse({
+      const jobPayload = {
         documentId: document.id,
         s3Key: document.s3Key,
         mimeType: document.mimeType,
         fileName: document.fileName,
-      });
-      await fastify.thumbnailsQueue.add(THUMBNAILS_QUEUE, job);
+      };
+      await Promise.all([
+        fastify.thumbnailsQueue.add(THUMBNAILS_QUEUE, ThumbnailJobSchema.parse(jobPayload)),
+        fastify.processingQueue.add(PROCESSING_QUEUE, OcrJobSchema.parse(jobPayload)),
+      ]);
 
       return reply.status(202).send({ status: "queued" });
     },

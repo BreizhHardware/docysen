@@ -1,0 +1,27 @@
+{
+  "name": "ocr-worker",
+  "sourceRoot": "apps/ocr-worker/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test -x .venv/bin/python && .venv/bin/python -m src.main || python3 -m src.main",
+        "cwd": "apps/ocr-worker"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test -x .venv/bin/pytest && .venv/bin/pytest || pytest",
+        "cwd": "apps/ocr-worker"
+      }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker build -t docysen/ocr-worker .",
+        "cwd": "apps/ocr-worker"
+      }
+    }
+  }
+}

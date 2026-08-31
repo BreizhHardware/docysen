@@ -46,6 +46,20 @@ services:
       - redis
       - garage
 
+  # Optionnel en dev : `nx dev ocr-worker` (venv local, voir apps/ocr-worker/README.md) est plus
+  # rapide à itérer dessus que de reconstruire l'image à chaque changement de code.
+  ocr-worker:
+    build:
+      context: .
+      dockerfile: apps/ocr-worker/Dockerfile
+    env_file: .env
+    environment:
+      REDIS_URL: redis://redis:6379
+      S3_ENDPOINT: http://garage:3900
+    depends_on:
+      - redis
+      - garage
+
 volumes:
   postgres-data:
   garage-meta:
