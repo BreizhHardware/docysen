@@ -8,6 +8,7 @@ import {
 import { requireAuth, requireRole } from "../middleware/auth.js";
 import { toDocumentSummary, toDocumentSummaryWithThumbnail } from "../lib/documentSummary.js";
 import { indexDocument } from "../lib/search.js";
+import { TAGGING_QUEUE } from "../plugins/queue.js";
 
 const DOCUMENT_INCLUDE = {
   promo: { select: { label: true } },
@@ -70,6 +71,19 @@ export default async function moderationRoutes(fastify: FastifyInstance) {
       // Seuls les documents "approved" sont recherchables : c'est le seul
       // chemin de code qui fait passer un document dans cet état, donc le seul endroit où indexer.
       await indexDocument(fastify, updated);
+
+      // Déclencher le tagging si l'OCR est déjà terminé (ocrText disponible).
+      // Si l'OCR n'est pas encore fini, c'est le listener processingEvents qui enqueiera
+      // le job tagging dès la complétion — les deux cas sont mutuellement exclusifs.
+      if (updated.ocrText !== null) {
+        await fastify.taggingQueue.add(TAGGING_QUEUE, {
+          documentId: updated.id,
+          title: updated.title,
+          subject: updated.subject,
+          mimeType: updated.mimeType,
+          ocrText: updated.ocrText,
+        });
+      }
 
       const body: DocumentSummary = toDocumentSummary(updated);
       return reply.send(body);

@@ -1,0 +1,27 @@
+{
+  "name": "tagging-worker",
+  "sourceRoot": "apps/tagging-worker/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test -x .venv/bin/python && .venv/bin/python -m src.main || python3 -m src.main",
+        "cwd": "apps/tagging-worker"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test -x .venv/bin/pytest && .venv/bin/pytest || pytest",
+        "cwd": "apps/tagging-worker"
+      }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker build -t docysen/tagging-worker .",
+        "cwd": "apps/tagging-worker"
+      }
+    }
+  }
+}

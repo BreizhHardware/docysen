@@ -20,8 +20,8 @@ export async function configureMeilisearch(meili: MeiliSearch): Promise<void> {
   await meili.createIndex(DOCUMENTS_INDEX, { primaryKey: "id" }).catch(() => {
     // Index déjà créé lors d'un précédent démarrage : pas une erreur.
   });
-  await index.updateSearchableAttributes(["title", "subject", "fileName", "ocrExcerpt"]);
-  await index.updateFilterableAttributes(["promoId", "subject", "fileType"]);
+  await index.updateSearchableAttributes(["title", "subject", "tags", "fileName", "ocrExcerpt"]);
+  await index.updateFilterableAttributes(["promoId", "subject", "fileType", "tags"]);
   await index.updateSortableAttributes(["createdAt"]);
 }
 

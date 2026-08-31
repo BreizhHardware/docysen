@@ -10,13 +10,21 @@ const OCR_EXCERPT_LENGTH = 2000;
 type DocumentWithPromo = Document & { promo: Pick<Promo, "label"> };
 
 /**
- * Déclenché uniquement à l'approbation d'un document (voir routes/moderation.ts) : seuls les
- * documents `approved` sont recherchables
+ * Indexe (ou ré-indexe) un document `approved` dans Meilisearch. Peut être appelé plusieurs fois
+ * sur le même document (à l'approbation, après OCR, après tagging) : Meilisearch remplace le
+ * document existant par son id, donc c'est idempotent.
+ * Les tags sont fetchés depuis Prisma à chaque appel pour garantir qu'on indexe l'état courant.
  */
 export async function indexDocument(
   fastify: FastifyInstance,
   document: DocumentWithPromo,
 ): Promise<void> {
+  const documentTags = await fastify.prisma.documentTag.findMany({
+    where: { documentId: document.id },
+    include: { tag: { select: { label: true } } },
+  });
+  const tags = documentTags.map((dt) => dt.tag.label);
+
   await fastify.meili.index(DOCUMENTS_INDEX).addDocuments([
     {
       id: document.id,
@@ -30,6 +38,7 @@ export async function indexDocument(
       mimeType: document.mimeType,
       fileType: fileTypeFromMimeType(document.mimeType),
       ocrExcerpt: document.ocrText?.slice(0, OCR_EXCERPT_LENGTH) ?? "",
+      tags,
       createdAt: document.createdAt.getTime(),
     },
   ]);
