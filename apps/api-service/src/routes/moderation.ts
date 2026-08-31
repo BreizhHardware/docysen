@@ -8,7 +8,7 @@ import {
 import { requireAuth, requireRole } from "../middleware/auth.js";
 import { toDocumentSummary, toDocumentSummaryWithThumbnail } from "../lib/documentSummary.js";
 import { indexDocument } from "../lib/search.js";
-import { TAGGING_QUEUE } from "../plugins/queue.js";
+import { NOTIFICATIONS_QUEUE, TAGGING_QUEUE } from "../plugins/queue.js";
 
 const DOCUMENT_INCLUDE = {
   promo: { select: { label: true } },
@@ -114,6 +114,12 @@ export default async function moderationRoutes(fastify: FastifyInstance) {
         return reply.status(409).send({ error: "Ce document a déjà été modéré" });
       }
 
+      // On a besoin de l'auteur du document (et de son notificationEmail) pour l'email.
+      const uploader = await fastify.prisma.user.findUnique({
+        where: { id: document.uploadedById },
+        select: { firstName: true, lastName: true, notificationEmail: true },
+      });
+
       const [updated] = await fastify.prisma.$transaction([
         fastify.prisma.document.update({
           where: { id },
@@ -124,6 +130,17 @@ export default async function moderationRoutes(fastify: FastifyInstance) {
           data: { documentId: id, moderatorId: moderator.id, action: "rejected", reason },
         }),
       ]);
+
+      // Notification par email : no-op silencieux si l'étudiant n'a pas opté in.
+      if (uploader?.notificationEmail) {
+        await fastify.notificationsQueue.add(NOTIFICATIONS_QUEUE, {
+          documentId: updated.id,
+          documentTitle: updated.title,
+          recipientEmail: uploader.notificationEmail,
+          recipientName: `${uploader.firstName} ${uploader.lastName}`,
+          reason,
+        });
+      }
 
       const body: DocumentSummary = toDocumentSummary(updated);
       return reply.send(body);

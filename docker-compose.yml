@@ -32,6 +32,14 @@ services:
       - garage-data:/data/data
       - ./infra/garage.toml:/etc/garage.toml
 
+  # Serveur SMTP de test : capture les emails sans les envoyer réellement.
+  # Interface web : http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1025:1025" # SMTP (cible de SMTP_HOST/SMTP_PORT en dev)
+      - "8025:8025" # Interface web
+
   # Optionnel en dev : `nx dev thumbnail-worker` (venv local, voir apps/thumbnail-worker/README.md)
   # est plus rapide à itérer dessus que de reconstruire l'image à chaque changement de code.
   thumbnail-worker:

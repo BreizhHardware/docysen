@@ -5,3 +5,4 @@ export * from "./ocr.types.js";
 export * from "./search.types.js";
 export * from "./tagging.types.js";
 export * from "./thumbnail.types.js";
+export * from "./notification.types.js";

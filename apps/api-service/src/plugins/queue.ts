@@ -8,6 +8,7 @@ import { env } from "../env.js";
 export const THUMBNAILS_QUEUE = "thumbnails";
 export const PROCESSING_QUEUE = "processing";
 export const TAGGING_QUEUE = "tagging";
+export const NOTIFICATIONS_QUEUE = "notifications";
 
 // Tag appliqué automatiquement quand aucun extracteur d'ocr-worker ne sait traiter le mimeType du document
 const UNSUPPORTED_FORMAT_TAG = "non-indexé";
@@ -17,6 +18,7 @@ declare module "fastify" {
     thumbnailsQueue: Queue;
     processingQueue: Queue;
     taggingQueue: Queue;
+    notificationsQueue: Queue;
   }
 }
 
@@ -39,6 +41,7 @@ export default fp(async (fastify: FastifyInstance) => {
   const processingEvents = new QueueEvents(PROCESSING_QUEUE, { connection });
   const taggingQueue = new Queue(TAGGING_QUEUE, { connection });
   const taggingEvents = new QueueEvents(TAGGING_QUEUE, { connection });
+  const notificationsQueue = new Queue(NOTIFICATIONS_QUEUE, { connection });
 
   events.on("completed", async ({ jobId }) => {
     try {
@@ -153,6 +156,7 @@ export default fp(async (fastify: FastifyInstance) => {
   fastify.decorate("thumbnailsQueue", queue);
   fastify.decorate("processingQueue", processingQueue);
   fastify.decorate("taggingQueue", taggingQueue);
+  fastify.decorate("notificationsQueue", notificationsQueue);
   fastify.addHook("onClose", async () => {
     await events.close();
     await queue.close();
@@ -160,5 +164,6 @@ export default fp(async (fastify: FastifyInstance) => {
     await processingQueue.close();
     await taggingEvents.close();
     await taggingQueue.close();
+    await notificationsQueue.close();
   });
 });

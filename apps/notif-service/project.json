@@ -1,0 +1,18 @@
+{
+  "name": "notif-service",
+  "sourceRoot": "apps/notif-service/src",
+  "targets": {
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run dev", "cwd": "apps/notif-service" }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run build", "cwd": "apps/notif-service" }
+    },
+    "docker-build": {
+      "executor": "nx:run-commands",
+      "options": { "command": "docker build -t docysen/notif-service .", "cwd": "apps/notif-service" }
+    }
+  }
+}
