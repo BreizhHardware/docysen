@@ -37,6 +37,33 @@ export const LoginResponseSchema = z.object({
 });
 export type LoginResponse = z.infer<typeof LoginResponseSchema>;
 
+/** Résumé d'un utilisateur, retourné par GET /admin/users. */
+export const UserSummarySchema = z.object({
+  id: z.string(),
+  aurionId: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  aurionEmail: z.string().email(),
+  role: UserRoleSchema,
+  notificationEmail: z.string().email().nullable(),
+  documentCount: z.number().int().nonnegative(),
+  createdAt: z.string(),
+});
+export type UserSummary = z.infer<typeof UserSummarySchema>;
+
+/** Corps de PATCH /admin/users/:id/role. */
+export const ChangeRoleSchema = z.object({
+  role: UserRoleSchema,
+});
+export type ChangeRoleBody = z.infer<typeof ChangeRoleSchema>;
+
+/** Corps de PATCH /promos/:id. */
+export const UpdatePromoSchema = z.object({
+  label: z.string().min(1).max(100).optional(),
+  semesters: z.array(z.string().min(1).max(20)).min(1).optional(),
+});
+export type UpdatePromoBody = z.infer<typeof UpdatePromoSchema>;
+
 /** Corps de PATCH /users/me/notification-email, consentement opt-in pour les notifications. */
 export const NotificationEmailChoiceSchema = z.discriminatedUnion("optIn", [
   z.object({ optIn: z.literal(true), email: z.string().email() }),

@@ -8,6 +8,8 @@ import UploadDocument from "./pages/UploadDocument";
 import Documents from "./pages/Documents";
 import Moderation from "./pages/Moderation";
 import Search from "./pages/Search";
+import Settings from "./pages/Settings";
+import Admin from "./pages/Admin";
 
 function RequireAuth({ children }: { children: ReactElement }) {
   const { token } = useAuth();
@@ -32,6 +34,8 @@ export default function App() {
         <Route path="documents/new" element={<UploadDocument />} />
         <Route path="moderation" element={<Moderation />} />
         <Route path="search" element={<Search />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="admin" element={<Admin />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

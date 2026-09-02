@@ -29,9 +29,7 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-sidebar px-4">
       <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-xl">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent text-xl font-bold text-white">
-            D
-          </div>
+          <img src="/docysen_logo.png" alt="Docysen" className="h-12 w-12 rounded-lg object-contain" />
           <h1 className="text-lg font-semibold text-slate-800">Docysen</h1>
           <p className="text-sm text-slate-500">Documents de cours, ISEN Ouest</p>
         </div>

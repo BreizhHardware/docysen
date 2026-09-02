@@ -1,4 +1,5 @@
 import type {
+  ChangeRoleBody,
   CreateDocumentBody,
   CreateDocumentResponse,
   DocumentSummary,
@@ -9,6 +10,9 @@ import type {
   SearchQuery,
   SearchResponse,
   SearchResult,
+  UpdatePromoBody,
+  UserRole,
+  UserSummary,
 } from "@docysen/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001";
@@ -152,6 +156,98 @@ export function searchDocuments(
   return fetch(`${API_SERVICE_BASE_URL}/search?${params.toString()}`, {
     headers: { Authorization: `Bearer ${token}` },
   }).then((res) => handle<SearchResponse>(res));
+}
+
+export function getDashboardStats(
+  token: string,
+): Promise<{ total: number; pending: number; approvedThisMonth: number }> {
+  return fetch(`${API_SERVICE_BASE_URL}/dashboard/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle(res));
+}
+
+export function getLikes(
+  token: string,
+): Promise<{ likedDocumentIds: string[]; favoriteSubjects: string[] }> {
+  return fetch(`${API_SERVICE_BASE_URL}/likes`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle(res));
+}
+
+export function toggleDocumentLike(
+  token: string,
+  documentId: string,
+): Promise<{ liked: boolean; count: number }> {
+  return fetch(`${API_SERVICE_BASE_URL}/likes/documents/${documentId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle(res));
+}
+
+export function toggleSubjectFavorite(
+  token: string,
+  subject: string,
+): Promise<{ favorited: boolean; subject: string }> {
+  return fetch(`${API_SERVICE_BASE_URL}/likes/subjects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ subject }),
+  }).then((res) => handle(res));
+}
+
+// ── Admin ──────────────────────────────────────────────────────────────────
+
+export function getAdminUsers(token: string): Promise<UserSummary[]> {
+  return fetch(`${API_SERVICE_BASE_URL}/admin/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle<UserSummary[]>(res));
+}
+
+export function changeUserRole(
+  token: string,
+  userId: string,
+  role: UserRole,
+): Promise<{ id: string; role: UserRole; firstName: string; lastName: string }> {
+  return fetch(`${API_SERVICE_BASE_URL}/admin/users/${userId}/role`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ role } satisfies ChangeRoleBody),
+  }).then((res) => handle(res));
+}
+
+export function getAdminOverview(
+  token: string,
+): Promise<{ byStatus: Record<string, number>; totalStorageBytes: number }> {
+  return fetch(`${API_SERVICE_BASE_URL}/admin/overview`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle(res));
+}
+
+export function updatePromo(
+  token: string,
+  promoId: string,
+  body: UpdatePromoBody,
+): Promise<PromoSummary> {
+  return fetch(`${API_SERVICE_BASE_URL}/promos/${promoId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  }).then((res) => handle<PromoSummary>(res));
+}
+
+export function deletePromo(token: string, promoId: string): Promise<void> {
+  return fetch(`${API_SERVICE_BASE_URL}/promos/${promoId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  }).then(async (res) => {
+    if (!res.ok) {
+      const body = await res.json().catch(() => undefined);
+      throw new ApiError(body?.error ?? `Erreur ${res.status}`, res.status);
+    }
+  });
 }
 
 export function setNotificationEmail(

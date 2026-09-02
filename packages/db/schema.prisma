@@ -39,6 +39,8 @@ model User {
 
   documents        Document[]
   moderationEvents ModerationEvent[]
+  likes            Like[]
+  subjectFavorites SubjectFavorite[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -87,6 +89,7 @@ model Document {
 
   tags             DocumentTag[]
   moderationEvents ModerationEvent[]
+  likes            Like[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -126,4 +129,29 @@ model ModerationEvent {
   createdAt DateTime @default(now())
 
   @@index([documentId])
+}
+
+/** J'aime un document : un étudiant ne peut liker qu'une seule fois le même document. */
+model Like {
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, documentId])
+  @@index([documentId])
+}
+
+/** Matière favorite : stockée par nom (chaîne libre, identique au champ `subject` des documents). */
+model SubjectFavorite {
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject String // valeur libre identique à Document.subject
+
+  createdAt DateTime @default(now())
+
+  @@id([userId, subject])
+  @@index([userId])
 }
