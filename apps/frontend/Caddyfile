@@ -1,0 +1,19 @@
+:80 {
+	encode gzip
+
+	handle_path /svc/auth/* {
+		reverse_proxy auth-service:3001
+	}
+
+	handle_path /svc/api/* {
+		reverse_proxy api-service:3002
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	header -Server
+}

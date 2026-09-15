@@ -4,20 +4,17 @@ COPY . .
 
 RUN printf '\nnodeLinker: hoisted\n' >> pnpm-workspace.yaml
 RUN corepack enable && pnpm install --frozen-lockfile
+RUN pnpm --filter @docysen/notif-service run build
 
-RUN DATABASE_URL="postgresql://build:build@localhost:5432/build" pnpm --filter @docysen/db run generate
-RUN pnpm --filter @docysen/api-service run build
-
-RUN cp -rL apps/api-service/node_modules /tmp/workspace-deps
+RUN cp -rL apps/notif-service/node_modules /tmp/workspace-deps
 
 FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build /repo/apps/api-service/dist ./dist
-COPY --from=build /repo/apps/api-service/package.json ./
+COPY --from=build /repo/apps/notif-service/dist ./dist
+COPY --from=build /repo/apps/notif-service/package.json ./
 COPY --from=build /repo/node_modules ./node_modules
 COPY --from=build /tmp/workspace-deps ./node_modules
 COPY --from=build /repo/packages ./packages
-EXPOSE 3002
 
 CMD ["node", "--import", "tsx", "dist/main.js"]

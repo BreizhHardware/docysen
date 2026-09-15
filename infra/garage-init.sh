@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Bootstrap Garage en dev local. À lancer une fois après `docker compose up -d garage`
+# Bootstrap Garage (dev local ou preprod/prod). À lancer une fois après
+# `docker compose up -d garage`. En preprod, passer la vraie origine du frontend :
+#   CORS_ALLOWED_ORIGIN=https://preprod.docysen.fr ./infra/garage-init.sh
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -40,12 +42,24 @@ if ! garage key list | grep -q "$KEY_NAME"; then
 
   echo "Configuration CORS du bucket pour $CORS_ALLOWED_ORIGIN"
   garage bucket allow --owner --key "$KEY_NAME" "$BUCKET" >/dev/null
-  S3_ENDPOINT="http://localhost:3900" \
-    S3_BUCKET="$BUCKET" \
-    AWS_ACCESS_KEY_ID="$ACCESS_KEY_ID" \
-    AWS_SECRET_ACCESS_KEY="$SECRET_ACCESS_KEY" \
-    CORS_ALLOWED_ORIGIN="$CORS_ALLOWED_ORIGIN" \
-    node "$REPO_ROOT/packages/utils/scripts/configure-garage-cors.mjs"
+  if command -v node >/dev/null 2>&1; then
+    S3_ENDPOINT="http://localhost:3900" \
+      S3_BUCKET="$BUCKET" \
+      AWS_ACCESS_KEY_ID="$ACCESS_KEY_ID" \
+      AWS_SECRET_ACCESS_KEY="$SECRET_ACCESS_KEY" \
+      CORS_ALLOWED_ORIGIN="$CORS_ALLOWED_ORIGIN" \
+      node "$REPO_ROOT/packages/utils/scripts/configure-garage-cors.mjs"
+  else
+    echo "node introuvable sur l'hôte, exécution du script CORS dans un conteneur éphémère..."
+    docker run --rm --network container:"$CONTAINER" \
+      -v "$REPO_ROOT/packages/utils/scripts/configure-garage-cors.mjs":/script.mjs:ro \
+      -e S3_ENDPOINT="http://localhost:3900" \
+      -e S3_BUCKET="$BUCKET" \
+      -e AWS_ACCESS_KEY_ID="$ACCESS_KEY_ID" \
+      -e AWS_SECRET_ACCESS_KEY="$SECRET_ACCESS_KEY" \
+      -e CORS_ALLOWED_ORIGIN="$CORS_ALLOWED_ORIGIN" \
+      node:24-alpine sh -c "npm install --no-save --silent @aws-sdk/client-s3 && node /script.mjs"
+  fi
   garage bucket deny --owner --key "$KEY_NAME" "$BUCKET" >/dev/null
 
   echo
