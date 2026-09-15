@@ -9,6 +9,10 @@
 		reverse_proxy api-service:3002
 	}
 
+	handle_path /s3/* {
+		reverse_proxy garage:3900
+	}
+
 	handle {
 		root * /srv
 		try_files {path} /index.html

@@ -76,7 +76,7 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-dev}:${POSTGRES_PASSWORD:-dev}@postgres:5432/${POSTGRES_DB:-docysen}
-      S3_ENDPOINT: http://garage:3900
+      S3_ENDPOINT: ${PUBLIC_ORIGIN}/s3
       MEILISEARCH_URL: http://meilisearch:7700
       REDIS_URL: redis://redis:6379
     depends_on:
