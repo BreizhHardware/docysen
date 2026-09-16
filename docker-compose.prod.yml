@@ -52,9 +52,7 @@ services:
       retries: 10
 
   auth-service:
-    build:
-      context: .
-      dockerfile: apps/auth-service/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/auth-service:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -69,9 +67,7 @@ services:
       retries: 5
 
   api-service:
-    build:
-      context: .
-      dockerfile: apps/api-service/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/api-service:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -95,9 +91,7 @@ services:
       retries: 5
 
   notif-service:
-    build:
-      context: .
-      dockerfile: apps/notif-service/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/notif-service:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -107,9 +101,7 @@ services:
         condition: service_healthy
 
   thumbnail-worker:
-    build:
-      context: .
-      dockerfile: apps/thumbnail-worker/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/thumbnail-worker:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -122,9 +114,7 @@ services:
         condition: service_healthy
 
   ocr-worker:
-    build:
-      context: .
-      dockerfile: apps/ocr-worker/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/ocr-worker:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -137,9 +127,7 @@ services:
         condition: service_healthy
 
   tagging-worker:
-    build:
-      context: .
-      dockerfile: apps/tagging-worker/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/tagging-worker:latest
     restart: unless-stopped
     env_file: .env
     environment:
@@ -149,9 +137,7 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: .
-      dockerfile: apps/frontend/Dockerfile
+    image: ghcr.io/breizhhardware/docysen/frontend:latest
     restart: unless-stopped
     environment:
       # Utilisé par le Caddyfile ({$S3_BUCKET}) pour router les uploads/téléchargements
