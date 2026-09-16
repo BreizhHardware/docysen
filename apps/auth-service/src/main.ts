@@ -28,6 +28,16 @@ await fastify.register(rateLimit, {
   global: false, // on l'applique explicitement sur /auth/login pour éviter le brute-force
 });
 
+fastify.addContentTypeParser("*", (_request, payload, done) => {
+  let data = "";
+  payload.on("data", (chunk) => {
+    data += chunk;
+  });
+  payload.on("end", () => {
+    done(null, data || undefined);
+  });
+});
+
 await fastify.register(prismaPlugin);
 
 await fastify.register(async (instance) => {

@@ -28,6 +28,16 @@ await fastify.register(cors, {
   methods: ["GET", "HEAD", "POST", "PATCH", "DELETE"],
 });
 
+fastify.addContentTypeParser("*", (_request, payload, done) => {
+  let data = "";
+  payload.on("data", (chunk) => {
+    data += chunk;
+  });
+  payload.on("end", () => {
+    done(null, data || undefined);
+  });
+});
+
 await fastify.register(prismaPlugin);
 await fastify.register(s3Plugin);
 await fastify.register(meilisearchPlugin);
