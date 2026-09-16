@@ -80,7 +80,7 @@ jobs:
         run: |
           echo "image=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')/${{ matrix.service }}" >> "$GITHUB_OUTPUT"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "tag=$(echo '${{ github.head_ref }}' | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9._-' '-')" >> "$GITHUB_OUTPUT"
+            echo "tag=$(printf '%s' '${{ github.head_ref }}' | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9._-' '-')" >> "$GITHUB_OUTPUT"
           else
             echo "tag=latest" >> "$GITHUB_OUTPUT"
           fi
