@@ -3,7 +3,7 @@ WORKDIR /repo
 COPY . .
 
 RUN printf '\nnodeLinker: hoisted\n' >> pnpm-workspace.yaml
-RUN corepack enable && pnpm install --frozen-lockfile
+RUN npm install -g pnpm@12.4.2 && pnpm install --frozen-lockfile
 
 
 ARG VITE_API_BASE_URL=/svc/auth

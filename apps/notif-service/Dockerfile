@@ -3,7 +3,7 @@ WORKDIR /repo
 COPY . .
 
 RUN printf '\nnodeLinker: hoisted\n' >> pnpm-workspace.yaml
-RUN corepack enable && pnpm install --frozen-lockfile
+RUN npm install -g pnpm@12.4.2 && pnpm install --frozen-lockfile
 RUN pnpm --filter @docysen/notif-service run build
 
 RUN cp -rL apps/notif-service/node_modules /tmp/workspace-deps

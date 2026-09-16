@@ -1,4 +1,9 @@
 :80 {
+	log {
+		output stdout
+		format console
+	}
+
 	encode gzip
 
 	handle_path /svc/auth/* {
@@ -9,7 +14,7 @@
 		reverse_proxy api-service:3002
 	}
 
-	handle_path /s3/* {
+	handle /{$S3_BUCKET}/* {
 		reverse_proxy garage:3900
 	}
 
