@@ -5,9 +5,9 @@ import AppLayout from "./components/AppLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import UploadDocument from "./pages/UploadDocument";
-import Documents from "./pages/Documents";
 import Moderation from "./pages/Moderation";
 import Search from "./pages/Search";
+import Favorites from "./pages/Favorites";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 
@@ -30,10 +30,10 @@ export default function App() {
         }
       >
         <Route index element={<Dashboard />} />
-        <Route path="documents" element={<Documents />} />
         <Route path="documents/new" element={<UploadDocument />} />
         <Route path="moderation" element={<Moderation />} />
         <Route path="search" element={<Search />} />
+        <Route path="favorites" element={<Favorites />} />
         <Route path="settings" element={<Settings />} />
         <Route path="admin" element={<Admin />} />
       </Route>

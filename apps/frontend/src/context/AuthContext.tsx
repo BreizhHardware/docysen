@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { LoginResponse } from "@docysen/types";
-import { login as apiLogin } from "../lib/api";
+import { login as apiLogin, SESSION_STORAGE_KEY } from "../lib/api";
 
 type AuthUser = LoginResponse["user"];
 
@@ -14,12 +14,10 @@ interface AuthState {
   dismissFirstLogin: () => void;
 }
 
-const STORAGE_KEY = "docysen.session";
-
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 function readSession(): { token: string; user: AuthUser } | null {
-  const raw = sessionStorage.getItem(STORAGE_KEY);
+  const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -41,14 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
     setIsFirstLogin(res.user.isFirstLogin);
     // Refresh token en sessionStorage (jamais localStorage).
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ token: res.token, user: res.user }));
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ token: res.token, user: res.user }));
   }, []);
 
   const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     setIsFirstLogin(false);
-    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
   }, []);
 
   const dismissFirstLogin = useCallback(() => {

@@ -1,8 +1,19 @@
 import type { FastifyInstance } from "fastify";
+import type { LikesResponse } from "@docysen/types";
 import { requireAuth } from "../middleware/auth.js";
+import { toDocumentSummaryWithThumbnail } from "../lib/documentSummary.js";
+
+const DOCUMENT_INCLUDE = {
+  promo: { select: { label: true } },
+  uploadedBy: { select: { firstName: true, lastName: true } },
+} as const;
 
 export default async function likesRoutes(fastify: FastifyInstance) {
-  /** Retourne les IDs des documents likés par l'utilisateur + ses matières favorites. */
+  /**
+   * IDs des documents likés + ces mêmes documents en
+   * détail, prêts à afficher + les matières favorites. Un document liké puis
+   * rejeté/supprimé disparaît de `likedDocuments` : même logique que /search, approved uniquement.
+   */
   fastify.get("/likes", { preHandler: requireAuth }, async (request, reply) => {
     const user = await fastify.prisma.user.findUnique({
       where: { aurionId: request.user!.userId },
@@ -10,17 +21,39 @@ export default async function likesRoutes(fastify: FastifyInstance) {
     if (!user) return reply.status(404).send({ error: "Utilisateur introuvable" });
 
     const [likes, subjectFavorites] = await Promise.all([
-      fastify.prisma.like.findMany({ where: { userId: user.id }, select: { documentId: true } }),
+      fastify.prisma.like.findMany({
+        where: { userId: user.id },
+        select: { documentId: true },
+        orderBy: { createdAt: "desc" },
+      }),
       fastify.prisma.subjectFavorite.findMany({
         where: { userId: user.id },
         select: { subject: true },
       }),
     ]);
 
-    return reply.send({
-      likedDocumentIds: likes.map((l) => l.documentId),
+    const likedDocumentIds = likes.map((l) => l.documentId);
+    const likedDocumentsById = new Map(
+      (
+        await fastify.prisma.document.findMany({
+          where: { id: { in: likedDocumentIds }, status: "approved" },
+          include: DOCUMENT_INCLUDE,
+        })
+      ).map((document) => [document.id, document]),
+    );
+    const likedDocuments = await Promise.all(
+      likedDocumentIds
+        .map((id) => likedDocumentsById.get(id))
+        .filter((document) => document !== undefined)
+        .map((document) => toDocumentSummaryWithThumbnail(fastify, document)),
+    );
+
+    const body: LikesResponse = {
+      likedDocumentIds,
+      likedDocuments,
       favoriteSubjects: subjectFavorites.map((s) => s.subject),
-    });
+    };
+    return reply.send(body);
   });
 
   /** Toggle like sur un document (idempotent : double appel = unlike). */

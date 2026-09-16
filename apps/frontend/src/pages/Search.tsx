@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { FileTypeCategory, PromoSummary, SearchResult } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
-import { getPromos, searchDocuments } from "../lib/api";
+import { getPromos, getSubjects, searchDocuments } from "../lib/api";
 import DocumentThumbnail from "../components/DocumentThumbnail";
 import DocumentPreviewModal from "../components/DocumentPreviewModal";
 import StatusBadge from "../components/StatusBadge";
@@ -23,11 +24,15 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 export default function Search() {
   const { token } = useAuth();
+  // q/subject vivent dans l'URL : un lien externe (barre de recherche
+  // du haut, matière favorite) doit mettre à jour ces filtres même si Search est déjà montée.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const q = searchParams.get("q") ?? "";
+  const subject = searchParams.get("subject") ?? "";
 
   const [promos, setPromos] = useState<PromoSummary[]>([]);
-  const [q, setQ] = useState("");
+  const [subjects, setSubjects] = useState<string[]>([]);
   const [promoId, setPromoId] = useState("");
-  const [subject, setSubject] = useState("");
   const [fileType, setFileType] = useState<FileTypeCategory | "">("");
   const [page, setPage] = useState(0);
 
@@ -43,6 +48,11 @@ export default function Search() {
       .then(setPromos)
       .catch(() => {
         /* les filtres promo restent vides, pas bloquant pour la recherche */
+      });
+    getSubjects(token)
+      .then(setSubjects)
+      .catch(() => {
+        /* le filtre matière reste vide, pas bloquant pour la recherche */
       });
   }, [token]);
 
@@ -77,6 +87,21 @@ export default function Search() {
     };
   }
 
+  function updateUrlFilter(param: "q" | "subject") {
+    return (value: string) => {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (value) next.set(param, value);
+          else next.delete(param);
+          return next;
+        },
+        { replace: true },
+      );
+      setPage(0);
+    };
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
@@ -93,7 +118,7 @@ export default function Search() {
           type="text"
           placeholder="Rechercher (titre, matière, contenu...)"
           value={q}
-          onChange={(e) => updateFilter(setQ)(e.target.value)}
+          onChange={(e) => updateUrlFilter("q")(e.target.value)}
           className="input lg:col-span-2"
         />
         <select
@@ -122,13 +147,21 @@ export default function Search() {
             </option>
           ))}
         </select>
-        <input
-          type="text"
-          placeholder="Matière"
+        <select
           value={subject}
-          onChange={(e) => updateFilter(setSubject)(e.target.value)}
+          onChange={(e) => updateUrlFilter("subject")(e.target.value)}
           className="input lg:col-span-4"
-        />
+        >
+          <option value="">Toutes matières</option>
+          {/* Filet de sécurité : une matière arrivée par lien (ex. depuis Favoris) peut ne plus
+              avoir de document approuvé et donc être absente de la liste chargée depuis /subjects. */}
+          {subject && !subjects.includes(subject) && <option value={subject}>{subject}</option>}
+          {subjects.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
       </div>
 
       {error && <p className="text-sm text-red-600">{error}</p>}

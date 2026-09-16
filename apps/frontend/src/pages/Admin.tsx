@@ -3,7 +3,6 @@ import type { PromoSummary, UserRole, UserSummary } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
 import {
   changeUserRole,
-  createDocument,
   deletePromo,
   getAdminOverview,
   getAdminUsers,

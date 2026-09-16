@@ -3,6 +3,7 @@ import type {
   CreateDocumentBody,
   CreateDocumentResponse,
   DocumentSummary,
+  LikesResponse,
   LoginResponse,
   ModerationEvent,
   PreviewUrlResponse,
@@ -19,6 +20,8 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001
 // api-service est un service séparé de auth-service, pas juste une autre route.
 const API_SERVICE_BASE_URL = import.meta.env.VITE_API_SERVICE_BASE_URL ?? "http://localhost:3002";
 
+export const SESSION_STORAGE_KEY = "docysen.session";
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -30,6 +33,14 @@ export class ApiError extends Error {
 }
 
 async function handle<T>(res: Response): Promise<T> {
+  if (res.status === 401) {
+    // Session expirée ou invalide : purge et renvoie au login.
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+    if (!window.location.pathname.startsWith("/login")) {
+      window.location.href = "/login";
+    }
+    throw new ApiError("Session expirée", 401);
+  }
   const body = await res.json().catch(() => undefined);
   if (!res.ok) {
     throw new ApiError(body?.error ?? `Erreur ${res.status}`, res.status);
@@ -49,6 +60,13 @@ export function getPromos(token: string): Promise<PromoSummary[]> {
   return fetch(`${API_SERVICE_BASE_URL}/promos`, {
     headers: { Authorization: `Bearer ${token}` },
   }).then((res) => handle<PromoSummary[]>(res));
+}
+
+/** Matières distinctes des documents approuvés, pour peupler le dropdown de recherche. */
+export function getSubjects(token: string): Promise<string[]> {
+  return fetch(`${API_SERVICE_BASE_URL}/subjects`, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => handle<string[]>(res));
 }
 
 /** Crée le document en base (status "pending") et retourne une URL présignée pour l'upload direct. */
@@ -91,12 +109,6 @@ export function getPreviewUrl(token: string, documentId: string): Promise<Previe
   return fetch(`${API_SERVICE_BASE_URL}/documents/${documentId}/preview-url`, {
     headers: { Authorization: `Bearer ${token}` },
   }).then((res) => handle<PreviewUrlResponse>(res));
-}
-
-export function getDocuments(token: string): Promise<DocumentSummary[]> {
-  return fetch(`${API_SERVICE_BASE_URL}/documents`, {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then((res) => handle<DocumentSummary[]>(res));
 }
 
 /** File d'attente de modération (admin/modérateur uniquement, "pending" hors documents du modérateur lui-même). */
@@ -166,9 +178,7 @@ export function getDashboardStats(
   }).then((res) => handle(res));
 }
 
-export function getLikes(
-  token: string,
-): Promise<{ likedDocumentIds: string[]; favoriteSubjects: string[] }> {
+export function getLikes(token: string): Promise<LikesResponse> {
   return fetch(`${API_SERVICE_BASE_URL}/likes`, {
     headers: { Authorization: `Bearer ${token}` },
   }).then((res) => handle(res));

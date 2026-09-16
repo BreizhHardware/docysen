@@ -1,15 +1,35 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function Topbar() {
+export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [q, setQ] = useState("");
 
   const initials = user ? `${user.firstName[0] ?? ""}${user.lastName[0] ?? ""}`.toUpperCase() : "";
 
+  function handleSearchSubmit(e: FormEvent) {
+    e.preventDefault();
+    navigate(q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : "/search");
+  }
+
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6">
-      <div className="relative w-full max-w-md">
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:px-6">
+      {/* Bouton tiroir, mobile uniquement */}
+      <button
+        type="button"
+        onClick={onOpenSidebar}
+        aria-label="Ouvrir le menu"
+        className="shrink-0 rounded-md p-2 text-slate-500 hover:bg-surface lg:hidden"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="h-5 w-5">
+          <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      <form onSubmit={handleSearchSubmit} className="relative min-w-0 flex-1 sm:max-w-md">
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -25,12 +45,14 @@ export default function Topbar() {
         </svg>
         <input
           type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
           placeholder="Rechercher un document…"
           className="w-full rounded-md border border-slate-200 bg-surface py-2 pl-9 pr-3 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
         />
-      </div>
+      </form>
 
-      <div className="relative">
+      <div className="relative shrink-0">
         <button
           onClick={() => setMenuOpen((v) => !v)}
           className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-surface"

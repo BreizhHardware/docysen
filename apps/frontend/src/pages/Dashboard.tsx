@@ -10,38 +10,12 @@ import {
 } from "../lib/api";
 import DocumentThumbnail from "../components/DocumentThumbnail";
 import DocumentPreviewModal from "../components/DocumentPreviewModal";
+import LikeButton from "../components/LikeButton";
 
 interface Stats {
   total: number;
   pending: number;
   approvedThisMonth: number;
-}
-
-// Bouton like (cœur)
-function LikeButton({
-  liked,
-  label,
-  onClick,
-}: {
-  liked: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      title={liked ? `Retirer « ${label} » des favoris` : `Ajouter « ${label} » aux favoris`}
-      className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition
-        ${liked ? "bg-rose-100 text-rose-600 hover:bg-rose-200" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}
-    >
-      <span>{liked ? "♥" : "♡"}</span>
-      <span>{liked ? "Liké" : "Liker"}</span>
-    </button>
-  );
 }
 
 export default function Dashboard() {

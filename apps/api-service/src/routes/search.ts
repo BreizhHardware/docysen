@@ -15,6 +15,17 @@ function escapeFilterValue(value: string): string {
 }
 
 export default async function searchRoutes(fastify: FastifyInstance) {
+  /** Peuple le dropdown de matières du formulaire de recherche. */
+  fastify.get("/subjects", { preHandler: requireAuth }, async (_request, reply) => {
+    const rows = await fastify.prisma.document.findMany({
+      where: { status: "approved" },
+      select: { subject: true },
+      distinct: ["subject"],
+      orderBy: { subject: "asc" },
+    });
+    return reply.send(rows.map((row) => row.subject));
+  });
+
   /**
    * Grille de résultats consultable par tout étudiant authentifié (pas
    * réservé admin/modérateur, contrairement à /moderation) : seuls des documents `approved` sont
