@@ -17,7 +17,7 @@ const DOCUMENT_INCLUDE = {
 
 export default async function moderationRoutes(fastify: FastifyInstance) {
   /**
-   * File d'attente de modération : "pending" uniquement. 
+   * File d'attente de modération : "pending" uniquement.
    * Inclut la miniature (voir toDocumentSummaryWithThumbnail) : un modérateur doit
    * pouvoir consulter le contenu avant de statuer, pas juste les métadonnées
    */

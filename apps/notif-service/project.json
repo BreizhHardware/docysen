@@ -12,7 +12,10 @@
     },
     "docker-build": {
       "executor": "nx:run-commands",
-      "options": { "command": "docker build -t docysen/notif-service .", "cwd": "apps/notif-service" }
+      "options": {
+        "command": "docker build -t docysen/notif-service .",
+        "cwd": "apps/notif-service"
+      }
     }
   }
 }

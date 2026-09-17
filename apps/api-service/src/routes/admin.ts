@@ -41,9 +41,7 @@ export default async function adminRoutes(fastify: FastifyInstance) {
 
       const parseResult = ChangeRoleSchema.safeParse(request.body);
       if (!parseResult.success) {
-        return reply
-          .status(400)
-          .send({ error: "Rôle invalide", issues: parseResult.error.issues });
+        return reply.status(400).send({ error: "Rôle invalide", issues: parseResult.error.issues });
       }
       const { role } = parseResult.data;
 
