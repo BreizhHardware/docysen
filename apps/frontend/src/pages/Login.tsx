@@ -1,14 +1,22 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ApiError } from "../lib/api";
+import { ApiError, SESSION_EXPIRED_KEY } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
+
+function consumeSessionExpiredFlag(): boolean {
+  const expired = sessionStorage.getItem(SESSION_EXPIRED_KEY) === "1";
+  if (expired) sessionStorage.removeItem(SESSION_EXPIRED_KEY);
+  return expired;
+}
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() =>
+    consumeSessionExpiredFlag() ? "Session expirée, merci de te reconnecter." : null,
+  );
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {

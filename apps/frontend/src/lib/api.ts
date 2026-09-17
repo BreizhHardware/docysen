@@ -21,6 +21,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001
 const API_SERVICE_BASE_URL = import.meta.env.VITE_API_SERVICE_BASE_URL ?? "http://localhost:3002";
 
 export const SESSION_STORAGE_KEY = "docysen.session";
+export const SESSION_EXPIRED_KEY = "docysen.sessionExpired";
 
 export class ApiError extends Error {
   constructor(
@@ -40,6 +41,9 @@ async function handle<T>(
     // Session expirée ou invalide : purge et renvoie au login.
     sessionStorage.removeItem(SESSION_STORAGE_KEY);
     if (!window.location.pathname.startsWith("/login")) {
+      // window.location.href déclenche un rechargement complet, qui vide le JS en mémoire :
+      // on passe donc par sessionStorage plutôt que par un state React pour survivre au reload.
+      sessionStorage.setItem(SESSION_EXPIRED_KEY, "1");
       window.location.href = "/login";
     }
     throw new ApiError("Session expirée", 401);
