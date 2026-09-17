@@ -145,7 +145,7 @@ export default function Favorites() {
                   title={`Retirer ${subject} des favoris`}
                   className="rounded-full px-1.5 py-0.5 text-xs text-rose-400 hover:bg-rose-100 hover:text-rose-600"
                 >
-                  ♥ ×
+                  X
                 </button>
               </div>
               {total > SUBJECT_PREVIEW_LIMIT && (
