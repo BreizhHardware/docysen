@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import type { SearchResult } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -20,6 +21,7 @@ interface Stats {
 
 export default function Dashboard() {
   const { user, token } = useAuth();
+  const navigate = useNavigate();
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [recentDocs, setRecentDocs] = useState<SearchResult[]>([]);
@@ -129,19 +131,32 @@ export default function Dashboard() {
             {recentSubjects.map((subject) => {
               const isFav = favoriteSubjects.has(subject);
               return (
-                <button
+                <div
                   key={subject}
-                  type="button"
-                  onClick={() => handleToggleSubjectFav(subject)}
-                  title={
-                    isFav ? `Retirer ${subject} des favoris` : `Ajouter ${subject} aux favoris`
-                  }
-                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition
-                    ${isFav ? "border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"}`}
+                  className={`flex items-center rounded-full border text-sm font-medium transition
+                    ${isFav ? "border-orange-300 bg-yellow-100 text-yellow-700" : "border-slate-200 bg-white text-slate-700"}`}
                 >
-                  <span>{isFav ? "♥" : "♡"}</span>
-                  {subject}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleSubjectFav(subject)}
+                    title={
+                      isFav ? `Retirer ${subject} des favoris` : `Ajouter ${subject} aux favoris`
+                    }
+                    aria-label={
+                      isFav ? `Retirer ${subject} des favoris` : `Ajouter ${subject} aux favoris`
+                    }
+                    className="rounded-l-full py-1.5 pl-2 pr-0.5 transition hover:bg-orange-100"
+                  >
+                    <span>{isFav ? "⭐" : "★"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/search?subject=${encodeURIComponent(subject)}`)}
+                    className="rounded-r-full py-1.5 pl-1 pr-3 text-left transition hover:bg-slate-50 hover:underline"
+                  >
+                    {subject}
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -192,26 +207,6 @@ export default function Dashboard() {
           </div>
         )}
       </section>
-
-      {/* Matières favorites (si au moins une) */}
-      {favoriteSubjects.size > 0 && (
-        <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Tes matières favorites
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {Array.from(favoriteSubjects).map((subject) => (
-              <span
-                key={subject}
-                className="flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-sm font-medium text-rose-700"
-              >
-                <span>♥</span>
-                {subject}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Modal de prévisualisation */}
       {previewDoc && (

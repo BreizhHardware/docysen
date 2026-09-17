@@ -84,11 +84,18 @@ export default function DocumentPreviewModal({
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
           <h2 className="truncate text-sm font-semibold text-slate-800">{title}</h2>
           <div className="flex gap-2">
-            <LikeButton
-              liked={likedDocIds.has(documentId)}
-              label={title}
-              onClick={() => handleToggleDocLike(documentId)}
-            />
+            <button
+                  key={documentId}
+                  type="button"
+                  onClick={() => handleToggleDocLike(documentId)}
+                  title={
+                    likedDocIds.has(documentId) ? `Retirer « ${title} » des favoris` : `Ajouter « ${title} » aux favoris`
+                  }
+                  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition
+                    ${likedDocIds.has(documentId) ? "border-orange-300 bg-yellow-100 text-yellow-700 hover:bg-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"}`}
+                >
+                  <span>{likedDocIds.has(documentId) ? "⭐" : "★ Ajouter"}</span>
+                </button>
             <button
               type="button"
               onClick={onClose}
