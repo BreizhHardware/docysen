@@ -57,7 +57,6 @@ export default function Search() {
       });
     getLikes(token).then(({ likedDocumentIds, favoriteSubjects: subjects }) => {
       setLikedDocIds(new Set(likedDocumentIds));
-      setFavoriteSubjects(new Set(subjects));
     });
   }, [token]);
 
