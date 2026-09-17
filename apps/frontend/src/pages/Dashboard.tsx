@@ -218,6 +218,8 @@ export default function Dashboard() {
         <DocumentPreviewModal
           documentId={previewDoc.id}
           title={previewDoc.title}
+          likedDocIds={likedDocIds}
+          setLikedDocIds={setLikedDocIds}
           onClose={() => setPreviewDoc(null)}
         />
       )}

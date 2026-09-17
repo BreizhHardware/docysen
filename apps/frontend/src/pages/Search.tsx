@@ -243,6 +243,8 @@ export default function Search() {
         <DocumentPreviewModal
           documentId={previewing.id}
           title={previewing.title}
+          likedDocIds={likedDocIds}
+          setLikedDocIds={setLikedDocIds}
           onClose={() => setPreviewing(null)}
         />
       )}
