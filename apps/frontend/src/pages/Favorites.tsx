@@ -161,7 +161,9 @@ export default function Favorites() {
 
             {docs.length === 0 ? (
               <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
-                <p className="text-sm text-slate-500">Aucun document approuvé dans cette matière.</p>
+                <p className="text-sm text-slate-500">
+                  Aucun document approuvé dans cette matière.
+                </p>
               </div>
             ) : (
               <DocumentGrid

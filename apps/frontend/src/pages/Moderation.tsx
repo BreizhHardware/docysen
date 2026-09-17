@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import type { SearchResult } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
-import {
-  approveDocument,
-  getLikes,
-  getModerationQueue,
-  rejectDocument,
-} from "../lib/api";
+import { approveDocument, getLikes, getModerationQueue, rejectDocument } from "../lib/api";
 import DocumentThumbnail from "../components/DocumentThumbnail";
 import DocumentPreviewModal from "../components/DocumentPreviewModal";
 

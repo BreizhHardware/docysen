@@ -39,7 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.user);
     setIsFirstLogin(res.user.isFirstLogin);
     // Refresh token en sessionStorage (jamais localStorage).
-    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ token: res.token, user: res.user }));
+    sessionStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify({ token: res.token, user: res.user }),
+    );
   }, []);
 
   const logout = useCallback(() => {

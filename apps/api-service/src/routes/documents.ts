@@ -141,7 +141,7 @@ export default async function documentRoutes(fastify: FastifyInstance) {
 
   /**
    * URL présignée GET (courte durée) pour consulter le document dans le navigateur sans le
-   * télécharger à part. Sert `previewKey` (PDF converti) au lieu de `s3Key` quand il existe. 
+   * télécharger à part. Sert `previewKey` (PDF converti) au lieu de `s3Key` quand il existe.
    * Accessible au déposant, à tout modérateur/admin, ou à
    * n'importe quel étudiant authentifié si le document est déjà `approved`.
    */
