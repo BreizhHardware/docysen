@@ -55,7 +55,7 @@ export default function Search() {
       .catch(() => {
         /* le filtre matière reste vide, pas bloquant pour la recherche */
       });
-    getLikes(token).then(({ likedDocumentIds, favoriteSubjects: subjects }) => {
+    getLikes(token).then(({ likedDocumentIds }) => {
       setLikedDocIds(new Set(likedDocumentIds));
     });
   }, [token]);
