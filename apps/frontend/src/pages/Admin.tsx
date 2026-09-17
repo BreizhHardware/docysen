@@ -521,7 +521,9 @@ export default function Admin() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-xl font-semibold text-slate-800">Administration</h1>
-        <p className="text-sm text-slate-500">Gestion des promos, des utilisateurs et vue d'ensemble.</p>
+        <p className="text-sm text-slate-500">
+          Gestion des promos, des utilisateurs et vue d'ensemble.
+        </p>
       </div>
 
       {/* Onglets */}
@@ -542,9 +544,7 @@ export default function Admin() {
       {/* Contenu */}
       {tab === "overview" && <Overview token={token!} />}
       {tab === "promos" && <Promos token={token!} isAdmin={isAdmin} />}
-      {tab === "users" && isAdmin && (
-        <Users token={token!} currentUserId={user.userId} />
-      )}
+      {tab === "users" && isAdmin && <Users token={token!} currentUserId={user.userId} />}
       {tab === "users" && !isAdmin && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
           <p className="text-sm text-amber-700">

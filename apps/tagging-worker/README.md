@@ -5,6 +5,7 @@ Worker Python qui génère automatiquement des tags pour chaque document approuv
 ## Fonctionnement
 
 Consomme la queue BullMQ `tagging` produite par `api-service` :
+
 - **À l'approbation** du document (si `ocrText` est déjà disponible)
 - **Après complétion de l'OCR** (si le document était déjà approuvé)
 
@@ -41,9 +42,9 @@ pytest
 
 ## Variables d'environnement
 
-| Variable    | Défaut                   | Description              |
-|-------------|--------------------------|--------------------------|
-| `REDIS_URL` | `redis://localhost:6379` | URL de connexion Redis   |
+| Variable    | Défaut                   | Description            |
+| ----------- | ------------------------ | ---------------------- |
+| `REDIS_URL` | `redis://localhost:6379` | URL de connexion Redis |
 
 Chargées depuis le `.env` racine du monorepo.
 

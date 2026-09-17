@@ -121,9 +121,7 @@ export default function Settings() {
             <p className="text-sm text-emerald-600">✓ Préférences enregistrées.</p>
           )}
           {saveStatus === "error" && (
-            <p className="text-sm text-red-600">
-              Impossible d'enregistrer. Réessaie plus tard.
-            </p>
+            <p className="text-sm text-red-600">Impossible d'enregistrer. Réessaie plus tard.</p>
           )}
 
           <div className="flex justify-end">
@@ -146,9 +144,7 @@ export default function Settings() {
         <div className="flex items-center justify-between px-6 py-5">
           <div>
             <p className="text-sm font-medium text-slate-700">Se déconnecter</p>
-            <p className="text-xs text-slate-400">
-              Ferme la session en cours sur cet appareil.
-            </p>
+            <p className="text-xs text-slate-400">Ferme la session en cours sur cet appareil.</p>
           </div>
           <button
             type="button"
@@ -163,15 +159,7 @@ export default function Settings() {
   );
 }
 
-function Row({
-  label,
-  value,
-  mono = false,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
+function Row({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-4 px-6 py-3">
       <span className="text-sm text-slate-500">{label}</span>
