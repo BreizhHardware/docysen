@@ -1,4 +1,9 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export interface S3ClientConfig {
@@ -62,4 +67,13 @@ export async function getPresignedDownloadUrl(
   const expiresIn = request.expiresInSeconds ?? DEFAULT_DOWNLOAD_EXPIRES_IN_SECONDS;
   const command = new GetObjectCommand({ Bucket: request.bucket, Key: request.key });
   return getSignedUrl(client, command, { expiresIn });
+}
+
+export interface DeleteObjectRequest {
+  bucket: string;
+  key: string;
+}
+
+export async function deleteObject(client: S3Client, request: DeleteObjectRequest): Promise<void> {
+  await client.send(new DeleteObjectCommand({ Bucket: request.bucket, Key: request.key }));
 }
