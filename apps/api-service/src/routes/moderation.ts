@@ -1,13 +1,16 @@
-import type { FastifyInstance } from "fastify";
 import {
   RejectDocumentSchema,
   type DocumentSummary,
   type ModerationEvent,
   type SearchResult,
 } from "@docysen/types";
-import { requireAuth, requireRole } from "../middleware/auth.js";
+import { deleteObject } from "@docysen/utils";
+import type { FastifyInstance } from "fastify";
+
+import { env } from "../env.js";
 import { toDocumentSummary, toDocumentSummaryWithThumbnail } from "../lib/documentSummary.js";
 import { indexDocument } from "../lib/search.js";
+import { requireAuth, requireRole } from "../middleware/auth.js";
 import { NOTIFICATIONS_QUEUE, TAGGING_QUEUE } from "../plugins/queue.js";
 
 const DOCUMENT_INCLUDE = {
@@ -17,9 +20,9 @@ const DOCUMENT_INCLUDE = {
 
 export default async function moderationRoutes(fastify: FastifyInstance) {
   /**
-   * File d'attente de modération : "pending" uniquement.
-   * Inclut la miniature (voir toDocumentSummaryWithThumbnail) : un modérateur doit
-   * pouvoir consulter le contenu avant de statuer, pas juste les métadonnées
+   * File d'attente de modération : "pending" uniquement. Inclut la miniature (voir
+   * toDocumentSummaryWithThumbnail) : un modérateur doit pouvoir consulter le contenu avant de
+   * statuer, pas juste les métadonnées
    */
   fastify.get(
     "/moderation/queue",
@@ -130,6 +133,19 @@ export default async function moderationRoutes(fastify: FastifyInstance) {
           data: { documentId: id, moderatorId: moderator.id, action: "rejected", reason },
         }),
       ]);
+
+      // Document rejeté = ne sera jamais consulté : on libère l'espace sur Garage/S3 tout de
+      // suite plutôt que d'attendre un job de nettoyage.
+      const keysToDelete = [document.s3Key, document.thumbnailKey, document.previewKey].filter(
+        (key): key is string => key !== null,
+      );
+      await Promise.all(
+        keysToDelete.map((key) =>
+          deleteObject(fastify.s3, { bucket: env.S3_BUCKET, key }).catch((err) => {
+            fastify.log.error({ err, documentId: id, key }, "Échec suppression objet S3 rejeté");
+          }),
+        ),
+      );
 
       // Notification par email : no-op silencieux si l'étudiant n'a pas opté in.
       if (uploader?.notificationEmail) {
