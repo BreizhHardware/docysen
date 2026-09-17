@@ -3,7 +3,6 @@ import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { useAuth } from "../context/AuthContext";
 import { getPreviewUrl, toggleDocumentLike } from "../lib/api";
-import LikeButton from "./LikeButton";
 
 interface DocumentPreviewModalProps {
   documentId: string;
@@ -69,7 +68,7 @@ export default function DocumentPreviewModal({
         });
       });
     },
-    [token],
+    [setLikedDocIds, token],
   );
 
   return (
