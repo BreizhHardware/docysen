@@ -40,7 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "Mes favoris",
     to: "/favorites",
-    icon: <Icon d="M12 21c-4.5-3-9-6.5-9-11a5 5 0 019-3 5 5 0 019 3c0 4.5-4.5 8-9 11z" />,
+    icon: <Icon d="M12 3.5l2.78 5.63 6.22.9-4.5 4.39 1.06 6.2L12 17.7l-5.56 2.92 1.06-6.2L3 10.03l6.22-.9L12 3.5z" />,
   },
 ];
 
