@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { SearchResult } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
-import { approveDocument, getModerationQueue, rejectDocument } from "../lib/api";
+import { approveDocument, getLikes, getModerationQueue, rejectDocument } from "../lib/api";
 import DocumentThumbnail from "../components/DocumentThumbnail";
 import DocumentPreviewModal from "../components/DocumentPreviewModal";
 
@@ -10,6 +10,7 @@ export default function Moderation() {
   const isModerator = user?.role === "admin" || user?.role === "moderator";
 
   const [queue, setQueue] = useState<SearchResult[]>([]);
+  const [likedDocIds, setLikedDocIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // Motif de rejet en cours de saisie par document (10-500 caractères, voir RejectDocumentSchema).
@@ -24,6 +25,10 @@ export default function Moderation() {
       .then(setQueue)
       .catch(() => setError("Impossible de charger la file de modération."))
       .finally(() => setLoading(false));
+
+    getLikes(token).then(({ likedDocumentIds }) => {
+      setLikedDocIds(new Set(likedDocumentIds));
+    });
   }, [token, isModerator]);
 
   async function handleApprove(id: string) {
@@ -147,6 +152,8 @@ export default function Moderation() {
         <DocumentPreviewModal
           documentId={previewing.id}
           title={previewing.title}
+          likedDocIds={likedDocIds}
+          setLikedDocIds={setLikedDocIds}
           onClose={() => setPreviewing(null)}
         />
       )}

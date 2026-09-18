@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
 import { useAuth } from "../context/AuthContext";
-import { getPreviewUrl } from "../lib/api";
+import { getPreviewUrl, toggleDocumentLike } from "../lib/api";
 
 interface DocumentPreviewModalProps {
   documentId: string;
   title: string;
+  likedDocIds: Set<string>;
+  setLikedDocIds: React.Dispatch<React.SetStateAction<Set<string>>>;
   onClose: () => void;
 }
 
@@ -19,6 +21,8 @@ const MARKDOWN_MIME_TYPES = new Set(["text/markdown", "text/x-markdown"]);
 export default function DocumentPreviewModal({
   documentId,
   title,
+  likedDocIds,
+  setLikedDocIds,
   onClose,
 }: DocumentPreviewModalProps) {
   const { token } = useAuth();
@@ -52,6 +56,21 @@ export default function DocumentPreviewModal({
     };
   }, [token, documentId]);
 
+  const handleToggleDocLike = useCallback(
+    (docId: string) => {
+      if (!token) return;
+      toggleDocumentLike(token, docId).then(({ liked }) => {
+        setLikedDocIds((prev) => {
+          const next = new Set(prev);
+          if (liked) next.add(docId);
+          else next.delete(docId);
+          return next;
+        });
+      });
+    },
+    [setLikedDocIds, token],
+  );
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
@@ -63,13 +82,29 @@ export default function DocumentPreviewModal({
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
           <h2 className="truncate text-sm font-semibold text-slate-800">{title}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md px-2 py-1 text-slate-400 transition hover:bg-surface hover:text-slate-600"
-          >
-            Fermer
-          </button>
+          <div className="flex gap-2">
+            <button
+              key={documentId}
+              type="button"
+              onClick={() => handleToggleDocLike(documentId)}
+              title={
+                likedDocIds.has(documentId)
+                  ? `Retirer « ${title} » des favoris`
+                  : `Ajouter « ${title} » aux favoris`
+              }
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition
+                    ${likedDocIds.has(documentId) ? "border-orange-300 bg-yellow-100 text-yellow-700 hover:bg-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"}`}
+            >
+              <span>{likedDocIds.has(documentId) ? "⭐" : "★ Ajouter"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md px-2 py-1 text-slate-400 transition hover:bg-surface hover:text-slate-600"
+            >
+              Fermer
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-auto bg-slate-50">

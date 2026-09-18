@@ -1,14 +1,22 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ApiError } from "../lib/api";
+import { ApiError, SESSION_EXPIRED_KEY } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
+
+function consumeSessionExpiredFlag(): boolean {
+  const expired = sessionStorage.getItem(SESSION_EXPIRED_KEY) === "1";
+  if (expired) sessionStorage.removeItem(SESSION_EXPIRED_KEY);
+  return expired;
+}
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() =>
+    consumeSessionExpiredFlag() ? "Session expirée, merci de te reconnecter." : null,
+  );
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
@@ -29,7 +37,11 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-sidebar px-4">
       <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-xl">
         <div className="mb-8 flex flex-col items-center gap-2">
-          <img src="/docysen_logo.png" alt="Docysen" className="h-12 w-12 rounded-lg object-contain" />
+          <img
+            src="/docysen_logo.png"
+            alt="Docysen"
+            className="h-12 w-12 rounded-lg object-contain"
+          />
           <h1 className="text-lg font-semibold text-slate-800">Docysen</h1>
           <p className="text-sm text-slate-500">Documents de cours, ISEN Ouest</p>
         </div>

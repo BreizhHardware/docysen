@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { FileTypeCategory, PromoSummary, SearchResult } from "@docysen/types";
 import { useAuth } from "../context/AuthContext";
-import { getPromos, getSubjects, searchDocuments } from "../lib/api";
+import { getPromos, getSubjects, searchDocuments, getLikes, toggleDocumentLike } from "../lib/api";
 import DocumentThumbnail from "../components/DocumentThumbnail";
 import DocumentPreviewModal from "../components/DocumentPreviewModal";
-import StatusBadge from "../components/StatusBadge";
+import LikeButton from "../components/LikeButton";
 
 const FILE_TYPE_OPTIONS: { value: FileTypeCategory | ""; label: string }[] = [
   { value: "", label: "Tous types" },
@@ -35,6 +35,7 @@ export default function Search() {
   const [promoId, setPromoId] = useState("");
   const [fileType, setFileType] = useState<FileTypeCategory | "">("");
   const [page, setPage] = useState(0);
+  const [likedDocIds, setLikedDocIds] = useState<Set<string>>(new Set());
 
   const [results, setResults] = useState<SearchResult[]>([]);
   const [total, setTotal] = useState(0);
@@ -54,7 +55,25 @@ export default function Search() {
       .catch(() => {
         /* le filtre matière reste vide, pas bloquant pour la recherche */
       });
+    getLikes(token).then(({ likedDocumentIds }) => {
+      setLikedDocIds(new Set(likedDocumentIds));
+    });
   }, [token]);
+
+  const handleToggleDocLike = useCallback(
+    (docId: string) => {
+      if (!token) return;
+      toggleDocumentLike(token, docId).then(({ liked }) => {
+        setLikedDocIds((prev) => {
+          const next = new Set(prev);
+          if (liked) next.add(docId);
+          else next.delete(docId);
+          return next;
+        });
+      });
+    },
+    [token],
+  );
 
   useEffect(() => {
     if (!token) return;
@@ -186,7 +205,11 @@ export default function Search() {
               <p className="truncate text-xs text-slate-500">
                 {doc.subject} · {doc.promoLabel} {doc.semester}
               </p>
-              <StatusBadge status={doc.status} />
+              <LikeButton
+                liked={likedDocIds.has(doc.id)}
+                label={doc.title}
+                onClick={() => handleToggleDocLike(doc.id)}
+              />
             </div>
           </div>
         ))}
@@ -220,6 +243,8 @@ export default function Search() {
         <DocumentPreviewModal
           documentId={previewing.id}
           title={previewing.title}
+          likedDocIds={likedDocIds}
+          setLikedDocIds={setLikedDocIds}
           onClose={() => setPreviewing(null)}
         />
       )}

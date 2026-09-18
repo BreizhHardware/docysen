@@ -145,7 +145,7 @@ export default function Favorites() {
                   title={`Retirer ${subject} des favoris`}
                   className="rounded-full px-1.5 py-0.5 text-xs text-rose-400 hover:bg-rose-100 hover:text-rose-600"
                 >
-                  ♥ ×
+                  X
                 </button>
               </div>
               {total > SUBJECT_PREVIEW_LIMIT && (
@@ -161,7 +161,9 @@ export default function Favorites() {
 
             {docs.length === 0 ? (
               <div className="rounded-lg border border-slate-200 bg-white p-6 text-center">
-                <p className="text-sm text-slate-500">Aucun document approuvé dans cette matière.</p>
+                <p className="text-sm text-slate-500">
+                  Aucun document approuvé dans cette matière.
+                </p>
               </div>
             ) : (
               <DocumentGrid
@@ -205,6 +207,8 @@ export default function Favorites() {
         <DocumentPreviewModal
           documentId={previewDoc.id}
           title={previewDoc.title}
+          likedDocIds={likedDocIds}
+          setLikedDocIds={setLikedDocIds}
           onClose={() => setPreviewDoc(null)}
         />
       )}

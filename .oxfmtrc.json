@@ -1,4 +1,15 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": []
+  "ignorePatterns": [],
+  "jsdoc": {
+    "enabled": true,
+    "requireDescription": false,
+    "requireParamDescription": false,
+    "requireReturnDescription": false
+  },
+  "semi": true,
+  "endOfLine": "lf",
+  "sortImports": true,
+  "sortPackageJson": true,
+  "sortTailwindcss": true
 }

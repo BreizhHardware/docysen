@@ -21,6 +21,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001
 const API_SERVICE_BASE_URL = import.meta.env.VITE_API_SERVICE_BASE_URL ?? "http://localhost:3002";
 
 export const SESSION_STORAGE_KEY = "docysen.session";
+export const SESSION_EXPIRED_KEY = "docysen.sessionExpired";
 
 export class ApiError extends Error {
   constructor(
@@ -32,11 +33,17 @@ export class ApiError extends Error {
   }
 }
 
-async function handle<T>(res: Response): Promise<T> {
-  if (res.status === 401) {
+async function handle<T>(
+  res: Response,
+  { redirectOn401 = true }: { redirectOn401?: boolean } = {},
+): Promise<T> {
+  if (redirectOn401 && res.status === 401) {
     // Session expirée ou invalide : purge et renvoie au login.
     sessionStorage.removeItem(SESSION_STORAGE_KEY);
     if (!window.location.pathname.startsWith("/login")) {
+      // window.location.href déclenche un rechargement complet, qui vide le JS en mémoire :
+      // on passe donc par sessionStorage plutôt que par un state React pour survivre au reload.
+      sessionStorage.setItem(SESSION_EXPIRED_KEY, "1");
       window.location.href = "/login";
     }
     throw new ApiError("Session expirée", 401);
@@ -53,7 +60,7 @@ export function login(username: string, password: string): Promise<LoginResponse
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
-  }).then((res) => handle<LoginResponse>(res));
+  }).then((res) => handle<LoginResponse>(res, { redirectOn401: false }));
 }
 
 export function getPromos(token: string): Promise<PromoSummary[]> {
@@ -220,10 +227,18 @@ export function changeUserRole(
   token: string,
   userId: string,
   role: UserRole,
-): Promise<{ id: string; role: UserRole; firstName: string; lastName: string }> {
+): Promise<{
+  id: string;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+}> {
   return fetch(`${API_SERVICE_BASE_URL}/admin/users/${userId}/role`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ role } satisfies ChangeRoleBody),
   }).then((res) => handle(res));
 }
@@ -243,7 +258,10 @@ export function updatePromo(
 ): Promise<PromoSummary> {
   return fetch(`${API_SERVICE_BASE_URL}/promos/${promoId}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify(body),
   }).then((res) => handle<PromoSummary>(res));
 }

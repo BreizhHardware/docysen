@@ -24,7 +24,13 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
         aria-label="Ouvrir le menu"
         className="shrink-0 rounded-md p-2 text-slate-500 hover:bg-surface lg:hidden"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className="h-5 w-5">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.75}
+          className="h-5 w-5"
+        >
           <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
