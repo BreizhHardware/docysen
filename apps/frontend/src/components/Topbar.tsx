@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
 
 export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void }) {
@@ -16,13 +17,13 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
   }
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:px-6">
+    <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 sm:px-6">
       {/* Bouton tiroir, mobile uniquement */}
       <button
         type="button"
         onClick={onOpenSidebar}
         aria-label="Ouvrir le menu"
-        className="shrink-0 rounded-md p-2 text-slate-500 hover:bg-surface lg:hidden"
+        className="hover:bg-surface shrink-0 rounded-md p-2 text-slate-500 lg:hidden"
       >
         <svg
           viewBox="0 0 24 24"
@@ -41,7 +42,7 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
           fill="none"
           stroke="currentColor"
           strokeWidth={1.75}
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400"
         >
           <path
             d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"
@@ -54,16 +55,16 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Rechercher un document…"
-          className="w-full rounded-md border border-slate-200 bg-surface py-2 pl-9 pr-3 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+          className="bg-surface focus:border-accent focus:ring-accent w-full rounded-md border border-slate-200 py-2 pr-3 pl-9 text-sm outline-none focus:ring-1"
         />
       </form>
 
       <div className="relative shrink-0">
         <button
           onClick={() => setMenuOpen((v) => !v)}
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-surface"
+          className="hover:bg-surface flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-light text-xs font-semibold text-accent-hover">
+          <span className="bg-accent-light text-accent-hover flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold">
             {initials}
           </span>
           <span className="hidden text-slate-700 sm:inline">
@@ -76,7 +77,7 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
             <div className="px-3 py-2 text-xs text-slate-400">{user?.email}</div>
             <button
               onClick={logout}
-              className="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-surface"
+              className="hover:bg-surface block w-full px-3 py-2 text-left text-sm text-slate-600"
             >
               Se déconnecter
             </button>
