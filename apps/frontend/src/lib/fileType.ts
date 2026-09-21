@@ -2,8 +2,8 @@ import type { FileTypeCategory } from "@docysen/types";
 
 /**
  * Portage frontend de fileTypeFromMimeType (packages/utils/src/mimeType.ts) : dupliqué plutôt
- * qu'importé pour ne pas faire dépendre le bundle navigateur de @docysen/utils. Même logique, à garder en phase si un
- * type de fichier est ajouté d'un côté.
+ * qu'importé pour ne pas faire dépendre le bundle navigateur de @docysen/utils. Même logique, à
+ * garder en phase si un type de fichier est ajouté d'un côté.
  */
 export function fileTypeFromMimeType(mimeType: string): FileTypeCategory {
   if (mimeType === "application/pdf") return "pdf";

@@ -7,8 +7,8 @@ export type DocumentStatus = z.infer<typeof DocumentStatusSchema>;
 export const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024; // 50 Mo
 
 /**
- * Corps de POST /documents. Promo et semestre sont saisis manuellement par l'étudiant
- * (voir décisions ajoutées à la spec initiale) : WebAurion ne les expose pas de façon fiable.
+ * Corps de POST /documents. Promo et semestre sont saisis manuellement par l'étudiant (voir
+ * décisions ajoutées à la spec initiale) : WebAurion ne les expose pas de façon fiable.
  */
 export const CreateDocumentSchema = z.object({
   title: z.string().min(1).max(200),
@@ -26,7 +26,10 @@ export const CreateDocumentSchema = z.object({
 });
 export type CreateDocumentBody = z.infer<typeof CreateDocumentSchema>;
 
-/** Réponse de POST /documents : le document est créé en base (status "pending"), reste à uploader le fichier via `uploadUrl`. */
+/**
+ * Réponse de POST /documents : le document est créé en base (status "pending"), reste à uploader le
+ * fichier via `uploadUrl`.
+ */
 export const CreateDocumentResponseSchema = z.object({
   documentId: z.string(),
   uploadUrl: z.string(),
@@ -75,7 +78,8 @@ export type DocumentSummary = z.infer<typeof DocumentSummarySchema>;
 
 /**
  * Réponse de GET /documents/:id/preview-url. `previewMimeType` diffère de `mimeType` uniquement
- * pour DOCX/PPTX convertis en PDF côté worker : c'est toujours ce champ qu'il faut utiliser pour choisir le viewer côté frontend.
+ * pour DOCX/PPTX convertis en PDF côté worker : c'est toujours ce champ qu'il faut utiliser pour
+ * choisir le viewer côté frontend.
  */
 export const PreviewUrlResponseSchema = z.object({
   url: z.string(),

@@ -1,4 +1,5 @@
 import { FormEvent, useState } from "react";
+
 import { useAuth } from "../context/AuthContext";
 import { setNotificationEmail } from "../lib/api";
 
@@ -37,7 +38,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-2xl">
+    <div className="flex max-w-2xl flex-col gap-8">
       <div>
         <h1 className="text-xl font-semibold text-slate-800">Réglages</h1>
         <p className="text-sm text-slate-500">Gère ton compte et tes préférences.</p>
@@ -128,7 +129,7 @@ export default function Settings() {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
+              className="bg-accent hover:bg-accent-hover rounded-md px-4 py-2 text-sm font-medium text-white transition disabled:opacity-60"
             >
               {saving ? "Enregistrement…" : "Enregistrer"}
             </button>

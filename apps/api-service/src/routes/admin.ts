@@ -1,5 +1,6 @@
-import type { FastifyInstance } from "fastify";
 import { ChangeRoleSchema, type UserSummary } from "@docysen/types";
+import type { FastifyInstance } from "fastify";
+
 import { requireAuth, requireRole } from "../middleware/auth.js";
 
 export default async function adminRoutes(fastify: FastifyInstance) {
@@ -30,8 +31,8 @@ export default async function adminRoutes(fastify: FastifyInstance) {
   );
 
   /**
-   * Promotion ou rétrogradation d'un utilisateur (admin uniquement).
-   * Un admin ne peut pas changer son propre rôle pour éviter un lock-out accidentel.
+   * Promotion ou rétrogradation d'un utilisateur (admin uniquement). Un admin ne peut pas changer
+   * son propre rôle pour éviter un lock-out accidentel.
    */
   fastify.patch(
     "/admin/users/:id/role",

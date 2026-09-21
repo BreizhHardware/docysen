@@ -1,11 +1,12 @@
+import type { SearchResult } from "@docysen/types";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import type { SearchResult } from "@docysen/types";
+
+import DocumentPreviewModal from "../components/DocumentPreviewModal";
+import DocumentThumbnail from "../components/DocumentThumbnail";
+import LikeButton from "../components/LikeButton";
 import { useAuth } from "../context/AuthContext";
 import { getLikes, searchDocuments, toggleDocumentLike, toggleSubjectFavorite } from "../lib/api";
-import DocumentThumbnail from "../components/DocumentThumbnail";
-import DocumentPreviewModal from "../components/DocumentPreviewModal";
-import LikeButton from "../components/LikeButton";
 
 // Aperçu par matière favorite : au-delà, direction Recherche pour voir le reste.
 const SUBJECT_PREVIEW_LIMIT = 6;
@@ -41,7 +42,7 @@ function DocumentGrid({
               type="button"
               onClick={() => onSubjectClick(doc.subject)}
               title={`Voir tous les documents de ${doc.subject}`}
-              className="line-clamp-1 text-left text-xs text-slate-400 hover:text-accent hover:underline"
+              className="hover:text-accent line-clamp-1 text-left text-xs text-slate-400 hover:underline"
             >
               {doc.subject}
             </button>
@@ -136,7 +137,7 @@ export default function Favorites() {
           <section key={subject}>
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                <h2 className="text-sm font-semibold tracking-wide text-slate-500 uppercase">
                   {subject}
                 </h2>
                 <button
@@ -152,7 +153,7 @@ export default function Favorites() {
                 <button
                   type="button"
                   onClick={() => navigate(`/search?subject=${encodeURIComponent(subject)}`)}
-                  className="text-xs font-medium text-accent hover:underline"
+                  className="text-accent text-xs font-medium hover:underline"
                 >
                   Voir les {total} documents →
                 </button>
@@ -179,7 +180,7 @@ export default function Favorites() {
       })}
 
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="mb-3 text-sm font-semibold tracking-wide text-slate-500 uppercase">
           Documents likés
         </h2>
 

@@ -1,5 +1,6 @@
-import nodemailer from "nodemailer";
 import type { RejectionEmailPayload } from "@docysen/types";
+import nodemailer from "nodemailer";
+
 import { env } from "./env.js";
 
 const transporter = nodemailer.createTransport({
@@ -10,8 +11,8 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Envoie un email de rejet à l'étudiant.
- * Appelé uniquement si l'étudiant a fourni un notificationEmail (opté in).
+ * Envoie un email de rejet à l'étudiant. Appelé uniquement si l'étudiant a fourni un
+ * notificationEmail (opté in).
  */
 export async function sendRejectionEmail(payload: RejectionEmailPayload): Promise<void> {
   const { recipientEmail, recipientName, documentTitle, reason } = payload;

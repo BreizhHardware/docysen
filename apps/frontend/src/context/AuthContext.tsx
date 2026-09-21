@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { LoginResponse } from "@docysen/types";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+
 import { login as apiLogin, SESSION_STORAGE_KEY } from "../lib/api";
 
 type AuthUser = LoginResponse["user"];

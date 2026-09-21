@@ -1,4 +1,5 @@
 import type { FastifyInstance } from "fastify";
+
 import { requireAuth } from "../middleware/auth.js";
 
 export default async function dashboardRoutes(fastify: FastifyInstance) {

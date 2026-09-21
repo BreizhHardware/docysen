@@ -1,16 +1,16 @@
-import { config as loadDotenv } from "dotenv";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { config as loadDotenv } from "dotenv";
 import { z } from "zod";
 
 // Le .env vit à la racine du monorepo, pas dans chaque service.
 loadDotenv({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../.env") });
 
 /**
- * Champs communs à tous les services Node.
- * Chaque service étend ce schéma avec les variables qui lui sont propres,
- * plutôt que de forcer tous les services à déclarer des variables dont ils
- * n'ont pas besoin (ex: SMTP_* n'a de sens que pour notif-service).
+ * Champs communs à tous les services Node. Chaque service étend ce schéma avec les variables qui
+ * lui sont propres, plutôt que de forcer tous les services à déclarer des variables dont ils n'ont
+ * pas besoin (ex: SMTP_* n'a de sens que pour notif-service).
  */
 export const BaseEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -20,8 +20,8 @@ export const BaseEnvSchema = z.object({
 export type BaseEnv = z.infer<typeof BaseEnvSchema>;
 
 /**
- * Valide `process.env` contre un schéma et fait planter le service immédiatement
- * avec un message clair si une variable manque ou est mal formée.
+ * Valide `process.env` contre un schéma et fait planter le service immédiatement avec un message
+ * clair si une variable manque ou est mal formée.
  */
 export function loadEnv<T extends z.ZodTypeAny>(
   schema: T,

@@ -1,6 +1,10 @@
+import type { SearchResult } from "@docysen/types";
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import type { SearchResult } from "@docysen/types";
+
+import DocumentPreviewModal from "../components/DocumentPreviewModal";
+import DocumentThumbnail from "../components/DocumentThumbnail";
+import LikeButton from "../components/LikeButton";
 import { useAuth } from "../context/AuthContext";
 import {
   getDashboardStats,
@@ -9,9 +13,6 @@ import {
   toggleDocumentLike,
   toggleSubjectFavorite,
 } from "../lib/api";
-import DocumentThumbnail from "../components/DocumentThumbnail";
-import DocumentPreviewModal from "../components/DocumentPreviewModal";
-import LikeButton from "../components/LikeButton";
 
 interface Stats {
   total: number;
@@ -124,7 +125,7 @@ export default function Dashboard() {
       {/* Matières populaires avec favoris */}
       {recentSubjects.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          <h2 className="mb-3 text-sm font-semibold tracking-wide text-slate-500 uppercase">
             Matières récentes
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -133,8 +134,7 @@ export default function Dashboard() {
               return (
                 <div
                   key={subject}
-                  className={`flex items-center rounded-full border text-sm font-medium transition
-                    ${isFav ? "border-orange-300 bg-yellow-100 text-yellow-700" : "border-slate-200 bg-white text-slate-700"}`}
+                  className={`flex items-center rounded-full border text-sm font-medium transition ${isFav ? "border-orange-300 bg-yellow-100 text-yellow-700" : "border-slate-200 bg-white text-slate-700"}`}
                 >
                   <button
                     type="button"
@@ -145,14 +145,14 @@ export default function Dashboard() {
                     aria-label={
                       isFav ? `Retirer ${subject} des favoris` : `Ajouter ${subject} aux favoris`
                     }
-                    className="rounded-l-full py-1.5 pl-2 pr-0.5 transition hover:bg-orange-100"
+                    className="rounded-l-full py-1.5 pr-0.5 pl-2 transition hover:bg-orange-100"
                   >
                     <span>{isFav ? "⭐" : "★"}</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => navigate(`/search?subject=${encodeURIComponent(subject)}`)}
-                    className="rounded-r-full py-1.5 pl-1 pr-3 text-left transition hover:bg-slate-50 hover:underline"
+                    className="rounded-r-full py-1.5 pr-3 pl-1 text-left transition hover:bg-slate-50 hover:underline"
                   >
                     {subject}
                   </button>
@@ -165,7 +165,7 @@ export default function Dashboard() {
 
       {/* Derniers documents en ligne */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+        <h2 className="mb-3 text-sm font-semibold tracking-wide text-slate-500 uppercase">
           Derniers documents en ligne
         </h2>
 

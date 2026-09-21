@@ -1,5 +1,6 @@
-import { FormEvent, useEffect, useState, useCallback } from "react";
 import type { PromoSummary, UserRole, UserSummary } from "@docysen/types";
+import { FormEvent, useEffect, useState, useCallback } from "react";
+
 import { useAuth } from "../context/AuthContext";
 import {
   changeUserRole,
@@ -162,7 +163,7 @@ function PromoRow({
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
+              className="bg-accent hover:bg-accent-hover rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:opacity-60"
             >
               Enregistrer
             </button>
@@ -248,7 +249,7 @@ function Promos({ token, isAdmin }: { token: string; isAdmin: boolean }) {
           throw new Error(body?.error ?? `Erreur ${res.status}`);
         }
         const created: PromoSummary = await res.json();
-        setPromos((prev) => [...prev, created].sort((a, b) => a.label.localeCompare(b.label)));
+        setPromos((prev) => [...prev, created].toSorted((a, b) => a.label.localeCompare(b.label)));
         setNewLabel("");
         setNewSemesters("");
         setShowForm(false);
@@ -268,7 +269,7 @@ function Promos({ token, isAdmin }: { token: string; isAdmin: boolean }) {
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-hover"
+          className="bg-accent hover:bg-accent-hover rounded-md px-3 py-1.5 text-sm font-medium text-white"
         >
           + Nouvelle promo
         </button>
@@ -277,7 +278,7 @@ function Promos({ token, isAdmin }: { token: string; isAdmin: boolean }) {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="flex flex-wrap items-end gap-3 rounded-lg border border-accent/30 bg-accent/5 p-4"
+          className="border-accent/30 bg-accent/5 flex flex-wrap items-end gap-3 rounded-lg border p-4"
         >
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-slate-600">Label</label>
@@ -302,7 +303,7 @@ function Promos({ token, isAdmin }: { token: string; isAdmin: boolean }) {
           <button
             type="submit"
             disabled={creating}
-            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
+            className="bg-accent hover:bg-accent-hover rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
           >
             {creating ? "Création…" : "Créer"}
           </button>
@@ -318,7 +319,7 @@ function Promos({ token, isAdmin }: { token: string; isAdmin: boolean }) {
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="bg-slate-50 text-left text-xs font-medium tracking-wide text-slate-500 uppercase">
             <tr>
               <th className="px-4 py-3">Label</th>
               <th className="px-4 py-3">Semestres</th>
@@ -408,7 +409,7 @@ function UserRow({
             disabled={saving}
             value={u.role}
             onChange={(e) => handleRole(e.target.value as UserRole)}
-            className="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-60"
+            className="focus:ring-accent rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 focus:ring-1 focus:outline-none disabled:opacity-60"
           >
             {ROLE_OPTIONS.map((r) => (
               <option key={r} value={r}>
@@ -457,7 +458,7 @@ function Users({ token, currentUserId }: { token: string; currentUserId: string 
 
       <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-slate-200 text-sm">
-          <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+          <thead className="bg-slate-50 text-left text-xs font-medium tracking-wide text-slate-500 uppercase">
             <tr>
               <th className="px-4 py-3">Nom</th>
               <th className="px-4 py-3">Identifiant Aurion</th>
@@ -533,8 +534,7 @@ export default function Admin() {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition
-              ${tab === t.id ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition ${tab === t.id ? "bg-white text-slate-800 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
           >
             {t.label}
           </button>

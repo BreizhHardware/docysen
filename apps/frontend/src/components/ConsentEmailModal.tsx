@@ -1,10 +1,11 @@
 import { FormEvent, useState } from "react";
+
 import { useAuth } from "../context/AuthContext";
 import { setNotificationEmail } from "../lib/api";
 
 /**
- * Affichée une seule fois, à la première connexion. Consentement opt-in pour l'email
- * de notification (ex: rejet de document).
+ * Affichée une seule fois, à la première connexion. Consentement opt-in pour l'email de
+ * notification (ex: rejet de document).
  */
 export default function ConsentEmailModal() {
   const { token, user, dismissFirstLogin } = useAuth();
@@ -73,7 +74,7 @@ export default function ConsentEmailModal() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
+              className="bg-accent hover:bg-accent-hover flex-1 rounded-md px-4 py-2 text-sm font-medium text-white transition disabled:opacity-60"
             >
               Enregistrer et activer
             </button>
@@ -81,7 +82,7 @@ export default function ConsentEmailModal() {
               type="button"
               disabled={saving}
               onClick={() => handleChoice(false)}
-              className="flex-1 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-surface disabled:opacity-60"
+              className="hover:bg-surface flex-1 rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition disabled:opacity-60"
             >
               Non merci
             </button>

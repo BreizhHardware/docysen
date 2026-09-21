@@ -1,10 +1,11 @@
-import type { FastifyInstance } from "fastify";
-import jwt from "jsonwebtoken";
 import { LoginBodySchema, type LoginResponse, type JwtPayload } from "@docysen/types";
 import { buildIsenEmail, parseAurionName } from "@docysen/utils";
+import type { FastifyInstance } from "fastify";
+import jwt from "jsonwebtoken";
+
+import { env } from "../env.js";
 import { loginToWebAurion } from "../webaurion/client.js";
 import { WebAurionAuthError, WebAurionUnavailableError } from "../webaurion/errors.js";
-import { env } from "../env.js";
 
 export default async function loginRoutes(fastify: FastifyInstance) {
   fastify.post("/auth/login", async (request, reply) => {

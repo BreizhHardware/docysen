@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { BaseEnvSchema, loadEnv } from "@docysen/config";
+import { z } from "zod";
 
 export const NotifServiceEnvSchema = BaseEnvSchema.extend({
   REDIS_URL: z.url().default("redis://localhost:6379"),

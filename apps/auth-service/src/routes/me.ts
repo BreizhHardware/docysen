@@ -1,5 +1,6 @@
-import type { FastifyInstance } from "fastify";
 import { NotificationEmailChoiceSchema } from "@docysen/types";
+import type { FastifyInstance } from "fastify";
+
 import { requireAuth } from "../middleware/auth.js";
 
 export default async function meRoutes(fastify: FastifyInstance) {
@@ -20,9 +21,9 @@ export default async function meRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * Consentement opt-in pour l'email de notification (rejet de document, etc.).
-   * optIn: true  → enregistre l'adresse fournie par l'utilisateur (pas forcément l'email ISEN construit)
-   * optIn: false → efface toute adresse enregistrée, aucune notification ne sera envoyée
+   * Consentement opt-in pour l'email de notification (rejet de document, etc.). optIn: true →
+   * enregistre l'adresse fournie par l'utilisateur (pas forcément l'email ISEN construit) optIn:
+   * false → efface toute adresse enregistrée, aucune notification ne sera envoyée
    */
   fastify.patch(
     "/users/me/notification-email",

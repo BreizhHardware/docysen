@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
 import type { SearchResult } from "@docysen/types";
+import { useEffect, useState } from "react";
+
+import DocumentPreviewModal from "../components/DocumentPreviewModal";
+import DocumentThumbnail from "../components/DocumentThumbnail";
 import { useAuth } from "../context/AuthContext";
 import { approveDocument, getLikes, getModerationQueue, rejectDocument } from "../lib/api";
-import DocumentThumbnail from "../components/DocumentThumbnail";
-import DocumentPreviewModal from "../components/DocumentPreviewModal";
 
 export default function Moderation() {
   const { token, user } = useAuth();
@@ -129,7 +130,7 @@ export default function Moderation() {
                     type="button"
                     disabled={busyId === doc.id}
                     onClick={() => handleApprove(doc.id)}
-                    className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
+                    className="bg-accent hover:bg-accent-hover rounded-md px-4 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Approuver
                   </button>

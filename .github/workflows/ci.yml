@@ -37,6 +37,9 @@ jobs:
 
       - run: pnpm nx run-many -t test --exclude=ocr-worker,tagging-worker,thumbnail-worker
 
+      - name: Coverage thresholds (per project, 80%)
+        run: pnpm nx run-many -t test:coverage --exclude=ocr-worker,tagging-worker,thumbnail-worker
+
   test-python:
     runs-on: ubuntu-latest
     strategy:

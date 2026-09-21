@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { BaseEnvSchema, loadEnv } from "@docysen/config";
+import { z } from "zod";
 
 // auth-service et api-service tournent en parallèle (`pnpm dev` racine), ils ne peuvent pas
 // partager la variable `PORT` générique de BaseEnvSchema : chacun a la sienne dans le .env racine.

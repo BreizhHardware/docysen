@@ -1,6 +1,7 @@
-import fp from "fastify-plugin";
 import type { FastifyInstance } from "fastify";
+import fp from "fastify-plugin";
 import { MeiliSearch } from "meilisearch";
+
 import { env } from "../env.js";
 
 export const DOCUMENTS_INDEX = "documents";

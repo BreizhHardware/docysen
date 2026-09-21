@@ -1,6 +1,7 @@
-import type { FastifyInstance } from "fastify";
 import type { Document, Promo } from "@docysen/db";
 import { fileTypeFromMimeType } from "@docysen/utils";
+import type { FastifyInstance } from "fastify";
+
 import { DOCUMENTS_INDEX } from "../plugins/meilisearch.js";
 
 // Meilisearch indexe le texte intégral mais n'a pas besoin du texte OCR complet (peut être très
@@ -12,8 +13,8 @@ type DocumentWithPromo = Document & { promo: Pick<Promo, "label"> };
 /**
  * Indexe (ou ré-indexe) un document `approved` dans Meilisearch. Peut être appelé plusieurs fois
  * sur le même document (à l'approbation, après OCR, après tagging) : Meilisearch remplace le
- * document existant par son id, donc c'est idempotent.
- * Les tags sont fetchés depuis Prisma à chaque appel pour garantir qu'on indexe l'état courant.
+ * document existant par son id, donc c'est idempotent. Les tags sont fetchés depuis Prisma à chaque
+ * appel pour garantir qu'on indexe l'état courant.
  */
 export async function indexDocument(
   fastify: FastifyInstance,

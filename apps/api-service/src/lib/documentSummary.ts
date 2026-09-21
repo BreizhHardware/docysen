@@ -1,7 +1,8 @@
-import type { FastifyInstance } from "fastify";
-import type { DocumentSummary, SearchResult } from "@docysen/types";
 import type { Document, Promo, User } from "@docysen/db";
+import type { DocumentSummary, SearchResult } from "@docysen/types";
 import { getPresignedDownloadUrl } from "@docysen/utils";
+import type { FastifyInstance } from "fastify";
+
 import { env } from "../env.js";
 
 type DocumentWithRelations = Document & {

@@ -1,9 +1,11 @@
 import { z } from "zod";
+
 import { DocumentSummarySchema } from "./document.types.js";
 
 /**
  * Catégorie dérivée de `mimeType`, utilisée comme facette de filtre côté recherche et pour choisir
- * l'icône de fallback côté frontend quand `thumbnailUrl` est absent. Voir `fileTypeFromMimeType()`.
+ * l'icône de fallback côté frontend quand `thumbnailUrl` est absent. Voir
+ * `fileTypeFromMimeType()`.
  */
 export const FileTypeCategorySchema = z.enum([
   "pdf",

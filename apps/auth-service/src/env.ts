@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { BaseEnvSchema, loadEnv } from "@docysen/config";
+import { z } from "zod";
 
 export const AuthServiceEnvSchema = BaseEnvSchema.extend({
   JWT_SECRET: z.string().min(32, "JWT_SECRET doit faire au moins 32 caractères"),

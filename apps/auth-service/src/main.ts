@@ -1,6 +1,7 @@
-import Fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
+import Fastify from "fastify";
+
 import { env } from "./env.js";
 import prismaPlugin from "./plugins/prisma.js";
 import loginRoutes from "./routes/login.js";

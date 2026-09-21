@@ -1,5 +1,5 @@
-import type { FastifyInstance } from "fastify";
 import { randomUUID } from "node:crypto";
+
 import {
   CreateDocumentSchema,
   OcrJobSchema,
@@ -9,10 +9,12 @@ import {
   type PreviewUrlResponse,
 } from "@docysen/types";
 import { getPresignedDownloadUrl, getPresignedUploadUrl } from "@docysen/utils";
-import { requireAuth } from "../middleware/auth.js";
-import { toDocumentSummary } from "../lib/documentSummary.js";
-import { PROCESSING_QUEUE, THUMBNAILS_QUEUE } from "../plugins/queue.js";
+import type { FastifyInstance } from "fastify";
+
 import { env } from "../env.js";
+import { toDocumentSummary } from "../lib/documentSummary.js";
+import { requireAuth } from "../middleware/auth.js";
+import { PROCESSING_QUEUE, THUMBNAILS_QUEUE } from "../plugins/queue.js";
 
 // Caractères hors [a-zA-Z0-9._-] proscrits dans une clé S3/Garage sans encodage supplémentaire.
 function sanitizeFileName(fileName: string): string {
@@ -21,8 +23,8 @@ function sanitizeFileName(fileName: string): string {
 
 export default async function documentRoutes(fastify: FastifyInstance) {
   /**
-   * Étudiant : seulement ses propres documents. Admin/modérateur : tous les documents, pour
-   * avoir une vue d'ensemble (voir aussi GET /moderation/queue, restreint aux "pending").
+   * Étudiant : seulement ses propres documents. Admin/modérateur : tous les documents, pour avoir
+   * une vue d'ensemble (voir aussi GET /moderation/queue, restreint aux "pending").
    */
   fastify.get("/documents", { preHandler: requireAuth }, async (request, reply) => {
     const requester = request.user!;
@@ -40,8 +42,8 @@ export default async function documentRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * Crée le document en base (status "pending") et retourne une URL présignée pour l'upload
-   * direct du fichier vers Garage/S3 : le fichier ne transite jamais par api-service.
+   * Crée le document en base (status "pending") et retourne une URL présignée pour l'upload direct
+   * du fichier vers Garage/S3 : le fichier ne transite jamais par api-service.
    */
   fastify.post("/documents", { preHandler: requireAuth }, async (request, reply) => {
     const parseResult = CreateDocumentSchema.safeParse(request.body);
@@ -105,8 +107,8 @@ export default async function documentRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * Appelé par le frontend une fois le PUT vers l'URL présignée terminé avec succès : déclenche
-   * en parallèle la génération de miniature (queue BullMQ "thumbnails") et l'extraction de texte
+   * Appelé par le frontend une fois le PUT vers l'URL présignée terminé avec succès : déclenche en
+   * parallèle la génération de miniature (queue BullMQ "thumbnails") et l'extraction de texte
    * (queue "processing").
    */
   fastify.post(
@@ -142,8 +144,8 @@ export default async function documentRoutes(fastify: FastifyInstance) {
   /**
    * URL présignée GET (courte durée) pour consulter le document dans le navigateur sans le
    * télécharger à part. Sert `previewKey` (PDF converti) au lieu de `s3Key` quand il existe.
-   * Accessible au déposant, à tout modérateur/admin, ou à
-   * n'importe quel étudiant authentifié si le document est déjà `approved`.
+   * Accessible au déposant, à tout modérateur/admin, ou à n'importe quel étudiant authentifié si le
+   * document est déjà `approved`.
    */
   fastify.get("/documents/:id/preview-url", { preHandler: requireAuth }, async (request, reply) => {
     const { id } = request.params as { id: string };

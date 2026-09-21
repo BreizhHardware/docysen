@@ -1,9 +1,10 @@
-import fp from "fastify-plugin";
-import type { FastifyInstance } from "fastify";
-import { Queue, QueueEvents } from "bullmq";
 import { OcrResultSchema, TaggingResultSchema, ThumbnailResultSchema } from "@docysen/types";
-import { indexDocument } from "../lib/search.js";
+import { Queue, QueueEvents } from "bullmq";
+import type { FastifyInstance } from "fastify";
+import fp from "fastify-plugin";
+
 import { env } from "../env.js";
+import { indexDocument } from "../lib/search.js";
 
 export const THUMBNAILS_QUEUE = "thumbnails";
 export const PROCESSING_QUEUE = "processing";
@@ -23,15 +24,17 @@ declare module "fastify" {
 }
 
 /**
- * Producteurs des queues BullMQ "thumbnails", "processing" et "tagging" (consommées
- * respectivement par thumbnail-worker, ocr-worker et tagging-worker, tous trois Python)
- * + listeners sur leurs complétions pour persister thumbnailKey/previewKey/ocrText/tags.
- * L'écoute se fait via QueueEvents plutôt qu'un deuxième Worker.
+ * Producteurs des queues BullMQ "thumbnails", "processing" et "tagging" (consommées respectivement
+ * par thumbnail-worker, ocr-worker et tagging-worker, tous trois Python)
+ *
+ * - Listeners sur leurs complétions pour persister thumbnailKey/previewKey/ocrText/tags. L'écoute se
+ *   fait via QueueEvents plutôt qu'un deuxième Worker.
  *
  * Déclenchement du tagging :
- *   - À l'approbation d'un document si ocrText est déjà disponible (OCR terminé avant la modération).
- *   - Dans le listener OCR si le document est déjà approved au moment où le résultat arrive.
- *   Ces deux cas sont mutuellement exclusifs : un seul job de tagging par cycle approve+OCR.
+ *
+ * - À l'approbation d'un document si ocrText est déjà disponible (OCR terminé avant la modération).
+ * - Dans le listener OCR si le document est déjà approved au moment où le résultat arrive. Ces deux
+ *   cas sont mutuellement exclusifs : un seul job de tagging par cycle approve+OCR.
  */
 export default fp(async (fastify: FastifyInstance) => {
   const connection = { url: env.REDIS_URL };

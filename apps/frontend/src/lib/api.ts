@@ -118,7 +118,10 @@ export function getPreviewUrl(token: string, documentId: string): Promise<Previe
   }).then((res) => handle<PreviewUrlResponse>(res));
 }
 
-/** File d'attente de modération (admin/modérateur uniquement, "pending" hors documents du modérateur lui-même). */
+/**
+ * File d'attente de modération (admin/modérateur uniquement, "pending" hors documents du modérateur
+ * lui-même).
+ */
 export function getModerationQueue(token: string): Promise<SearchResult[]> {
   return fetch(`${API_SERVICE_BASE_URL}/moderation/queue`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -157,8 +160,8 @@ export function getModerationHistory(
 }
 
 /**
- * Grille de résultats, consultable par tout
- * étudiant : documents `approved` uniquement, avec miniatures présignées côté serveur.
+ * Grille de résultats, consultable par tout étudiant : documents `approved` uniquement, avec
+ * miniatures présignées côté serveur.
  */
 export function searchDocuments(
   token: string,

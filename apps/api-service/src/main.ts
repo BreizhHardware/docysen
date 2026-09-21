@@ -1,17 +1,18 @@
-import Fastify from "fastify";
 import cors from "@fastify/cors";
+import Fastify from "fastify";
+
 import { env } from "./env.js";
-import prismaPlugin from "./plugins/prisma.js";
-import s3Plugin from "./plugins/s3.js";
 import meilisearchPlugin from "./plugins/meilisearch.js";
+import prismaPlugin from "./plugins/prisma.js";
 import queuePlugin from "./plugins/queue.js";
-import documentRoutes from "./routes/documents.js";
-import promoRoutes from "./routes/promos.js";
-import moderationRoutes from "./routes/moderation.js";
-import searchRoutes from "./routes/search.js";
-import likesRoutes from "./routes/likes.js";
-import dashboardRoutes from "./routes/dashboard.js";
+import s3Plugin from "./plugins/s3.js";
 import adminRoutes from "./routes/admin.js";
+import dashboardRoutes from "./routes/dashboard.js";
+import documentRoutes from "./routes/documents.js";
+import likesRoutes from "./routes/likes.js";
+import moderationRoutes from "./routes/moderation.js";
+import promoRoutes from "./routes/promos.js";
+import searchRoutes from "./routes/search.js";
 
 const fastify = Fastify({
   logger: {
