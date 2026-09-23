@@ -9,7 +9,7 @@
     "test:coverage": "nx run-many -t test:coverage",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "format": "oxfmt .",
+    "format": "oxfmt",
     "format:check": "oxfmt --check .",
     "graph": "nx graph",
     "prepare": "node scripts/prepare.mjs"

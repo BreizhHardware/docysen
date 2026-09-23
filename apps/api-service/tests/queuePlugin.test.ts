@@ -2,12 +2,17 @@ import type { FastifyInstance } from "fastify";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../src/env.js", () => ({
-  env: { REDIS_URL: "redis://test:6379" },
+  env: { REDIS_URL: "redis://test:6379", S3_BUCKET: "docysen-dev" },
 }));
 
 const indexDocument = vi.fn().mockResolvedValue(undefined);
 vi.mock("../src/lib/search.js", () => ({
   indexDocument: (...args: unknown[]) => indexDocument(...args),
+}));
+
+const deleteObject = vi.fn().mockResolvedValue(undefined);
+vi.mock("@docysen/utils", () => ({
+  deleteObject: (...args: unknown[]) => deleteObject(...args),
 }));
 
 type Handlers = Record<string, (...args: never[]) => unknown>;
@@ -64,11 +69,18 @@ async function setup() {
   });
   const log = { error: vi.fn(), info: vi.fn(), warn: vi.fn(), debug: vi.fn() };
   const prisma = {
-    document: { update: vi.fn(), findUnique: vi.fn() },
+    document: {
+      update: vi.fn(),
+      // Compte 1 par défaut : simule un document toujours "pending"/"approved" (pas rejeté) au
+      // moment de l'écriture, cas nominal du listener thumbnails.
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+      findUnique: vi.fn(),
+    },
     tag: { upsert: vi.fn() },
     documentTag: { upsert: vi.fn() },
   };
-  const fastify = { decorate, addHook, log, prisma } as unknown as FastifyInstance;
+  const s3 = {};
+  const fastify = { decorate, addHook, log, prisma, s3 } as unknown as FastifyInstance;
 
   await queuePlugin(fastify);
 
@@ -79,6 +91,7 @@ async function setup() {
     hooks,
     log,
     prisma,
+    s3,
     thumbnails: {
       queue: queueInstances[THUMBNAILS_QUEUE],
       events: queueEventsInstances[THUMBNAILS_QUEUE],
@@ -94,6 +107,7 @@ async function setup() {
 
 beforeEach(() => {
   indexDocument.mockClear();
+  deleteObject.mockClear();
 });
 
 describe("queuePlugin - décoration et fermeture", () => {
@@ -130,10 +144,63 @@ describe("queuePlugin - queue thumbnails", () => {
 
     await thumbnails.events.handlers.completed({ jobId: "job-1" });
 
-    expect(prisma.document.update).toHaveBeenCalledWith({
-      where: { id: "doc-1" },
+    expect(prisma.document.updateMany).toHaveBeenCalledWith({
+      where: { id: "doc-1", status: { not: "rejected" } },
       data: { thumbnailKey: "thumb.png", previewKey: null },
     });
+    expect(deleteObject).not.toHaveBeenCalled();
+  });
+
+  it("supprime la miniature orpheline si le document a été rejeté entre-temps (race condition)", async () => {
+    const { thumbnails, prisma, s3 } = await setup();
+    // count: 0 => le garde-fou `status: { not: "rejected" } n'a matché aucune ligne : le
+    // document a été rejeté (et son s3Key déjà nettoyé par moderation.ts) pendant que
+    // thumbnail-worker traitait encore ce job.
+    prisma.document.updateMany.mockResolvedValue({ count: 0 });
+    thumbnails.queue.getJob.mockResolvedValue({
+      returnvalue: {
+        documentId: "doc-1",
+        thumbnailKey: "thumb.png",
+        previewKey: "preview.pdf",
+      },
+    });
+
+    await thumbnails.events.handlers.completed({ jobId: "job-1" });
+
+    expect(deleteObject).toHaveBeenCalledWith(s3, { bucket: "docysen-dev", key: "thumb.png" });
+    expect(deleteObject).toHaveBeenCalledWith(s3, { bucket: "docysen-dev", key: "preview.pdf" });
+  });
+
+  it("ne tente pas de supprimer une previewKey nulle après un rejet concurrent", async () => {
+    const { thumbnails, prisma } = await setup();
+    prisma.document.updateMany.mockResolvedValue({ count: 0 });
+    thumbnails.queue.getJob.mockResolvedValue({
+      returnvalue: { documentId: "doc-1", thumbnailKey: "thumb.png", previewKey: null },
+    });
+
+    await thumbnails.events.handlers.completed({ jobId: "job-1" });
+
+    expect(deleteObject).toHaveBeenCalledTimes(1);
+    expect(deleteObject).toHaveBeenCalledWith(expect.anything(), {
+      bucket: "docysen-dev",
+      key: "thumb.png",
+    });
+  });
+
+  it("logue une erreur sans bloquer si la suppression de l'orphelin échoue", async () => {
+    const { thumbnails, prisma, log } = await setup();
+    prisma.document.updateMany.mockResolvedValue({ count: 0 });
+    deleteObject.mockRejectedValueOnce(new Error("s3 down"));
+    thumbnails.queue.getJob.mockResolvedValue({
+      returnvalue: { documentId: "doc-1", thumbnailKey: "thumb.png", previewKey: null },
+    });
+
+    await thumbnails.events.handlers.completed({ jobId: "job-1" });
+
+    expect(log.error).toHaveBeenCalledWith(
+      expect.objectContaining({ jobId: "job-1", key: "thumb.png" }),
+      "Échec suppression miniature orpheline (document rejeté entre-temps)",
+    );
   });
 
   it("ne fait rien si le job n'existe plus", async () => {
@@ -142,7 +209,7 @@ describe("queuePlugin - queue thumbnails", () => {
 
     await thumbnails.events.handlers.completed({ jobId: "job-missing" });
 
-    expect(prisma.document.update).not.toHaveBeenCalled();
+    expect(prisma.document.updateMany).not.toHaveBeenCalled();
   });
 
   it("logue une erreur si le résultat est invalide", async () => {
@@ -151,7 +218,7 @@ describe("queuePlugin - queue thumbnails", () => {
 
     await thumbnails.events.handlers.completed({ jobId: "job-bad" });
 
-    expect(prisma.document.update).not.toHaveBeenCalled();
+    expect(prisma.document.updateMany).not.toHaveBeenCalled();
     expect(log.error).toHaveBeenCalledWith(
       expect.objectContaining({ jobId: "job-bad" }),
       "Échec de la persistance du résultat de miniature",

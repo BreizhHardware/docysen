@@ -1,10 +1,28 @@
 import { describe, it, expect, vi } from "vitest";
 
-import { createRouteCapture, makeReply, makeRequest } from "./helpers.js";
+import { createRouteCapture, expectRouteRoles, makeReply, makeRequest } from "./helpers.js";
 
-vi.mock("../src/env.js", () => ({ env: {} }));
+const JWT_SECRET = "test-secret-at-least-32-characters-long";
+vi.mock("../src/env.js", () => ({ env: { JWT_SECRET } }));
 
 const adminRoutes = (await import("../src/routes/admin.js")).default;
+
+describe("protection par rôle", () => {
+  /**
+   * Chaque route ici doit rester réservée à ces rôles précis : ce test rejoue la vraie chaîne
+   * [requireAuth, requireRole(...)] enregistrée sur la route pour chaque rôle existant, donc il
+   * échoue si `requireRole` est retiré ou si sa liste de rôles change
+   */
+  it.each([
+    ["GET", "/admin/users", ["admin"]],
+    ["PATCH", "/admin/users/:id/role", ["admin"]],
+    ["GET", "/admin/overview", ["admin", "moderator"]],
+  ] as const)("%s %s réservé à %j", async (method, path, allowedRoles) => {
+    const route = createRouteCapture();
+    await adminRoutes(route.fastify);
+    await expectRouteRoles(route, method, path, JWT_SECRET, [...allowedRoles]);
+  });
+});
 
 describe("GET /admin/users", () => {
   it("liste les utilisateurs avec leur nombre de documents", async () => {

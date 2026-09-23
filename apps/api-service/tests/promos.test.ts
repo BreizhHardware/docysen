@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 
-import { createRouteCapture, makeReply, makeRequest } from "./helpers.js";
+import { createRouteCapture, expectRouteRoles, makeReply, makeRequest } from "./helpers.js";
 
-vi.mock("../src/env.js", () => ({ env: {} }));
+const JWT_SECRET = "test-secret-at-least-32-characters-long";
+vi.mock("../src/env.js", () => ({ env: { JWT_SECRET } }));
 
 const promoRoutes = (await import("../src/routes/promos.js")).default;
 
@@ -11,6 +12,26 @@ async function setup(prismaOverrides: Record<string, unknown>) {
   await promoRoutes(fastify);
   return handler;
 }
+
+describe("protection par rôle", () => {
+  // Rejoue la vraie chaîne [requireAuth, requireRole(...)] enregistrée sur chaque route (pas un
+  // mock) pour tous les rôles existants : échoue si `requireRole` est retiré ou reconfiguré.
+  it.each([
+    ["POST", "/promos", ["admin", "moderator"]],
+    ["PATCH", "/promos/:id", ["admin", "moderator"]],
+    ["DELETE", "/promos/:id", ["admin"]],
+  ] as const)("%s %s réservé à %j", async (method, path, allowedRoles) => {
+    const route = createRouteCapture();
+    await promoRoutes(route.fastify);
+    await expectRouteRoles(route, method, path, JWT_SECRET, [...allowedRoles]);
+  });
+
+  it("GET /promos exige seulement une authentification, sans restriction de rôle", async () => {
+    const route = createRouteCapture();
+    await promoRoutes(route.fastify);
+    await expectRouteRoles(route, "GET", "/promos", JWT_SECRET, ["student", "moderator", "admin"]);
+  });
+});
 
 describe("GET /promos", () => {
   it("liste les promos triées par label", async () => {

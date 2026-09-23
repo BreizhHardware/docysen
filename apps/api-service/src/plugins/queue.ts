@@ -1,4 +1,5 @@
 import { OcrResultSchema, TaggingResultSchema, ThumbnailResultSchema } from "@docysen/types";
+import { deleteObject } from "@docysen/utils";
 import { Queue, QueueEvents } from "bullmq";
 import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
@@ -51,10 +52,28 @@ export default fp(async (fastify: FastifyInstance) => {
       const job = await queue.getJob(jobId);
       if (!job) return;
       const result = ThumbnailResultSchema.parse(job.returnvalue);
-      await fastify.prisma.document.update({
-        where: { id: result.documentId },
+
+      /** Le document peut avoir été rejeté pendant que thumbnail-worker traitait encore ce job */
+      const { count } = await fastify.prisma.document.updateMany({
+        where: { id: result.documentId, status: { not: "rejected" } },
         data: { thumbnailKey: result.thumbnailKey, previewKey: result.previewKey },
       });
+
+      if (count === 0) {
+        const orphanKeys = [result.thumbnailKey, result.previewKey].filter(
+          (key): key is string => key !== null,
+        );
+        await Promise.all(
+          orphanKeys.map((key) =>
+            deleteObject(fastify.s3, { bucket: env.S3_BUCKET, key }).catch((err) => {
+              fastify.log.error(
+                { err, jobId, key },
+                "Échec suppression miniature orpheline (document rejeté entre-temps)",
+              );
+            }),
+          ),
+        );
+      }
     } catch (err) {
       fastify.log.error({ err, jobId }, "Échec de la persistance du résultat de miniature");
     }

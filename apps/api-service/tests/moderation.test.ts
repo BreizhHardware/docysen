@@ -1,9 +1,15 @@
 import { describe, it, expect, vi } from "vitest";
 
-import { createRouteCapture, makeReply, makeRequest } from "./helpers.js";
+import { createRouteCapture, expectRouteRoles, makeReply, makeRequest } from "./helpers.js";
 
+const JWT_SECRET = "test-secret-at-least-32-characters-long";
 vi.mock("../src/env.js", () => ({
-  env: { S3_BUCKET: "docysen-dev", MEILISEARCH_URL: "http://localhost:7700", MEILISEARCH_KEY: "k" },
+  env: {
+    JWT_SECRET,
+    S3_BUCKET: "docysen-dev",
+    MEILISEARCH_URL: "http://localhost:7700",
+    MEILISEARCH_KEY: "k",
+  },
 }));
 
 const getPresignedDownloadUrl = vi.fn().mockResolvedValue("https://s3.example/thumb.png");
@@ -71,6 +77,30 @@ async function setup(overrides: Record<string, unknown> = {}) {
   await moderationRoutes(fastify);
   return { fastify, handler };
 }
+
+describe("protection par rôle", () => {
+  // Rejoue la vraie chaîne [requireAuth, requireRole(...)] enregistrée sur chaque route (pas un
+  // mock) pour tous les rôles existants : échoue si `requireRole` est retiré ou reconfiguré.
+  it.each([
+    ["GET", "/moderation/queue", ["admin", "moderator"]],
+    ["PATCH", "/moderation/:id/approve", ["admin", "moderator"]],
+    ["PATCH", "/moderation/:id/reject", ["admin", "moderator"]],
+  ] as const)("%s %s réservé à %j", async (method, path, allowedRoles) => {
+    const route = createRouteCapture();
+    await moderationRoutes(route.fastify);
+    await expectRouteRoles(route, method, path, JWT_SECRET, [...allowedRoles]);
+  });
+
+  it("GET /moderation/:id/history exige seulement une authentification (le contrôle d'accès se fait sur le contenu)", async () => {
+    const route = createRouteCapture();
+    await moderationRoutes(route.fastify);
+    await expectRouteRoles(route, "GET", "/moderation/:id/history", JWT_SECRET, [
+      "student",
+      "moderator",
+      "admin",
+    ]);
+  });
+});
 
 describe("GET /moderation/queue", () => {
   it("retourne les documents en attente avec miniature", async () => {
@@ -211,7 +241,13 @@ describe("PATCH /moderation/:id/reject", () => {
   });
 
   it("rejette, nettoie S3 et notifie si l'auteur a opté in", async () => {
-    const rejected = { ...pendingDocument, status: "rejected" };
+    const rejected = {
+      ...pendingDocument,
+      status: "rejected",
+      s3Key: "documents/doc-1.pdf",
+      thumbnailKey: "thumbs/doc-1.png",
+      previewKey: null,
+    };
     const $transaction = vi.fn().mockResolvedValue([rejected, {}]);
     const notificationsQueue = { add: vi.fn() };
     const { handler } = await setup({
@@ -260,6 +296,54 @@ describe("PATCH /moderation/:id/reject", () => {
     expect(reply.send).toHaveBeenCalledWith(
       expect.objectContaining({ id: "doc-1", status: "rejected" }),
     );
+  });
+
+  it("nettoie la miniature écrite par thumbnail-worker après la lecture initiale (race condition)", async () => {
+    // Le document lu avant la transaction n'a pas encore de thumbnailKey (thumbnail-worker n'avait
+    // pas fini). Entre-temps, le worker termine et écrit thumbnailKey/previewKey de façon
+    // concurrente (voir plugins/queue.ts) : la ligne renvoyée par la transaction de rejet, elle,
+    // les a déjà. Ce test garantit qu'on nettoie bien à partir de cette valeur fraîche, pas de la
+    // lecture périmée d'avant transaction, sans quoi l'objet resterait orphelin sur S3.
+    const staleDocument = { ...pendingDocument, s3Key: "documents/doc-1.pdf" };
+    const rejected = {
+      ...pendingDocument,
+      status: "rejected",
+      s3Key: "documents/doc-1.pdf",
+      thumbnailKey: "thumbs/doc-1-concurrent.png",
+      previewKey: "previews/doc-1-concurrent.pdf",
+    };
+    const $transaction = vi.fn().mockResolvedValue([rejected, {}]);
+    const { handler } = await setup({
+      prisma: {
+        user: {
+          findUnique: vi.fn().mockResolvedValueOnce({ id: "mod-1" }).mockResolvedValueOnce({
+            firstName: "Jean",
+            lastName: "Dupont",
+            notificationEmail: null,
+          }),
+        },
+        document: { findUnique: vi.fn().mockResolvedValue(staleDocument) },
+        $transaction,
+      },
+    });
+    const reply = makeReply();
+    await handler("PATCH", "/moderation/:id/reject")(
+      makeRequest({
+        params: { id: "doc-1" },
+        body: { reason: "Hors sujet" },
+        user: { userId: "mod1" },
+      }),
+      reply,
+    );
+
+    expect(deleteObject).toHaveBeenCalledWith(expect.anything(), {
+      bucket: "docysen-dev",
+      key: "thumbs/doc-1-concurrent.png",
+    });
+    expect(deleteObject).toHaveBeenCalledWith(expect.anything(), {
+      bucket: "docysen-dev",
+      key: "previews/doc-1-concurrent.pdf",
+    });
   });
 
   it("ne notifie pas si l'auteur n'a pas d'email de notification", async () => {
