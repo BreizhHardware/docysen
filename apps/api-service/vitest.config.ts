@@ -8,6 +8,7 @@ export default defineConfig({
       include: ["src/**/*.ts"],
       exclude: ["src/main.ts"],
       thresholds: {
+        perFile: true,
         lines: 80,
         statements: 80,
         functions: 80,

@@ -10,6 +10,7 @@ export default defineConfig({
       // ce serait un test d'intégration à part entière.
       exclude: ["src/main.ts"],
       thresholds: {
+        perFile: true,
         lines: 80,
         statements: 80,
         functions: 80,
