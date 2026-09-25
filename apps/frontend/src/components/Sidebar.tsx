@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
 
 interface NavItem {
@@ -31,7 +32,11 @@ const NAV_ITEMS: NavItem[] = [
       <Icon d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
     ),
   },
-  { label: "Déposer un document", to: "/documents/new", icon: <Icon d="M12 4v16m8-8H4" /> },
+  {
+    label: "Déposer un document",
+    to: "/documents/new",
+    icon: <Icon d="M12 4v16m8-8H4" />,
+  },
   {
     label: "Recherche",
     to: "/search",
@@ -70,18 +75,16 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex h-screen w-60 shrink-0 flex-col bg-sidebar
-          text-slate-200 transition-transform duration-200 lg:static lg:translate-x-0
-          ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`bg-sidebar fixed inset-y-0 left-0 z-40 flex h-screen w-60 shrink-0 flex-col text-slate-200 transition-transform duration-200 lg:static lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
-        <div className="flex items-center gap-2 px-5 py-5">
+        <Link to="/" onClick={onClose} className="flex items-center gap-2 px-5 py-5">
           <img
             src="/docysen_logo.png"
             alt="Docysen"
             className="h-8 w-8 rounded-md object-contain"
           />
           <span className="text-base font-semibold text-white">Docysen</span>
-        </div>
+        </Link>
 
         <nav className="flex-1 space-y-1 px-3">
           {NAV_ITEMS.map((item) => (
@@ -117,11 +120,11 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
         <div className="border-t border-white/10 px-3 py-3">
           <NavLink to="/settings" onClick={onClose} className={linkClass}>
             {/* Avatar initiales */}
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold text-white">
+            <div className="bg-accent flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white">
               {user ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "?"}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium leading-tight">
+              <p className="truncate text-xs leading-tight font-medium">
                 {user ? `${user.firstName} ${user.lastName}` : "Profil"}
               </p>
               <p className="text-[10px] text-slate-400">Réglages</p>
