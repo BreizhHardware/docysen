@@ -1,17 +1,18 @@
 import axios from "axios";
 import { wrapper } from "axios-cookiejar-support";
-import { CookieJar } from "tough-cookie";
 import * as cheerio from "cheerio";
+import { CookieJar } from "tough-cookie";
+
 import { WebAurionAuthError, WebAurionUnavailableError } from "./errors.js";
 
 /**
  * Il existe une page de login "legacy" (Spring, hors SSO Keycloak) à
- * `${baseUrl}/faces/Login.xhtml`, qui POST sur `${baseUrl}/login` : c'est l'approche
- * suivie par https://github.com/appen-isen/studysen. Le piège : il faut d'abord faire
- * un GET sur cette page pour établir la session (cookie JSESSIONID) *avant* de poster
- * les identifiants sur `/login`, sinon on retombe sur le SSO Keycloak.
- * axios ne gère pas les cookies entre requêtes par défaut (contrairement à
- * `fetch({credentials:"include"})` côté navigateur/RN), d'où le cookie jar explicite.
+ * `${baseUrl}/faces/Login.xhtml`, qui POST sur `${baseUrl}/login` : c'est l'approche suivie par
+ * https://github.com/appen-isen/studysen. Le piège : il faut d'abord faire un GET sur cette page
+ * pour établir la session (cookie JSESSIONID) _avant_ de poster les identifiants sur `/login`,
+ * sinon on retombe sur le SSO Keycloak. axios ne gère pas les cookies entre requêtes par défaut
+ * (contrairement à `fetch({credentials:"include"})` côté navigateur/RN), d'où le cookie jar
+ * explicite.
  */
 const LOGIN_PAGE_PATH = "/faces/Login.xhtml";
 const LOGIN_POST_PATH = "/login";
@@ -25,17 +26,21 @@ const NAME_SELECTORS = [
 ];
 
 export interface WebAurionLoginResult {
-  /** Nom complet brut tel qu'affiché par WebAurion, format exact non garanti, à parser via @docysen/utils. */
+  /**
+   * Nom complet brut tel qu'affiché par WebAurion, format exact non garanti, à parser via
+   *
+   * @docysen/utils.
+   */
   rawName: string;
 }
 
 /**
- * Authentifie un utilisateur auprès de WebAurion (formulaire legacy, pas la SSO Keycloak)
- * et récupère son nom affiché.
+ * Authentifie un utilisateur auprès de WebAurion (formulaire legacy, pas la SSO Keycloak) et
+ * récupère son nom affiché.
  *
- * Les identifiants ne transitent qu'en mémoire le temps de cet appel :
- * ils ne sont ni écrits sur disque, ni loggés, ni retournés par cette fonction.
- * Le cookie jar est local à cet appel (nouvelle instance à chaque login), jamais partagé/persisté.
+ * Les identifiants ne transitent qu'en mémoire le temps de cet appel : ils ne sont ni écrits sur
+ * disque, ni loggés, ni retournés par cette fonction. Le cookie jar est local à cet appel (nouvelle
+ * instance à chaque login), jamais partagé/persisté.
  */
 export async function loginToWebAurion(
   username: string,

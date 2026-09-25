@@ -1,6 +1,7 @@
+import { JwtPayloadSchema, type JwtPayload } from "@docysen/types";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
-import { JwtPayloadSchema, type JwtPayload } from "@docysen/types";
+
 import { env } from "../env.js";
 
 declare module "fastify" {

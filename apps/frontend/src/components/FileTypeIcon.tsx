@@ -1,4 +1,5 @@
 import type { FileTypeCategory } from "@docysen/types";
+
 import { fileTypeFromMimeType } from "../lib/fileType";
 
 const PATHS: Record<FileTypeCategory, string> = {
@@ -21,7 +22,10 @@ const LABELS: Record<FileTypeCategory, string> = {
   other: "Fichier",
 };
 
-/** Fallback icône par type de fichier, affiché tant que `thumbnailUrl` est absent (voir DocumentThumbnail). */
+/**
+ * Fallback icône par type de fichier, affiché tant que `thumbnailUrl` est absent (voir
+ * DocumentThumbnail).
+ */
 export default function FileTypeIcon({ mimeType }: { mimeType: string }) {
   const fileType = fileTypeFromMimeType(mimeType);
   return (
@@ -35,7 +39,7 @@ export default function FileTypeIcon({ mimeType }: { mimeType: string }) {
       >
         <path d={PATHS[fileType]} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
-      <span className="text-xs font-medium uppercase tracking-wide">{LABELS[fileType]}</span>
+      <span className="text-xs font-medium tracking-wide uppercase">{LABELS[fileType]}</span>
     </div>
   );
 }

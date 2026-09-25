@@ -1,7 +1,8 @@
-import type { FastifyInstance } from "fastify";
 import type { LikesResponse } from "@docysen/types";
-import { requireAuth } from "../middleware/auth.js";
+import type { FastifyInstance } from "fastify";
+
 import { toDocumentSummaryWithThumbnail } from "../lib/documentSummary.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const DOCUMENT_INCLUDE = {
   promo: { select: { label: true } },
@@ -10,9 +11,9 @@ const DOCUMENT_INCLUDE = {
 
 export default async function likesRoutes(fastify: FastifyInstance) {
   /**
-   * IDs des documents likés + ces mêmes documents en
-   * détail, prêts à afficher + les matières favorites. Un document liké puis
-   * rejeté/supprimé disparaît de `likedDocuments` : même logique que /search, approved uniquement.
+   * IDs des documents likés + ces mêmes documents en détail, prêts à afficher + les matières
+   * favorites. Un document liké puis rejeté/supprimé disparaît de `likedDocuments` : même logique
+   * que /search, approved uniquement.
    */
   fastify.get("/likes", { preHandler: requireAuth }, async (request, reply) => {
     const user = await fastify.prisma.user.findUnique({

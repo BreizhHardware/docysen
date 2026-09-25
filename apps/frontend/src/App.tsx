@@ -1,15 +1,16 @@
 import type { ReactElement } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+
 import AppLayout from "./components/AppLayout";
-import Login from "./pages/Login";
+import { useAuth } from "./context/AuthContext";
+import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
-import UploadDocument from "./pages/UploadDocument";
+import Favorites from "./pages/Favorites";
+import Login from "./pages/Login";
 import Moderation from "./pages/Moderation";
 import Search from "./pages/Search";
-import Favorites from "./pages/Favorites";
 import Settings from "./pages/Settings";
-import Admin from "./pages/Admin";
+import UploadDocument from "./pages/UploadDocument";
 
 function RequireAuth({ children }: { children: ReactElement }) {
   const { token } = useAuth();

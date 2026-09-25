@@ -1,7 +1,8 @@
-import fp from "fastify-plugin";
-import type { FastifyInstance } from "fastify";
 import type { S3Client } from "@aws-sdk/client-s3";
 import { createS3Client } from "@docysen/utils";
+import type { FastifyInstance } from "fastify";
+import fp from "fastify-plugin";
+
 import { env } from "../env.js";
 
 declare module "fastify" {

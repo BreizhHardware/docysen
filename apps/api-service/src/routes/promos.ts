@@ -1,9 +1,13 @@
-import type { FastifyInstance } from "fastify";
 import { CreatePromoSchema, UpdatePromoSchema, type PromoSummary } from "@docysen/types";
+import type { FastifyInstance } from "fastify";
+
 import { requireAuth, requireRole } from "../middleware/auth.js";
 
 export default async function promoRoutes(fastify: FastifyInstance) {
-  /** Peuple les selects promo/semestre du formulaire d'upload (voir décisions : saisis manuellement). */
+  /**
+   * Peuple les selects promo/semestre du formulaire d'upload (voir décisions : saisis
+   * manuellement).
+   */
   fastify.get("/promos", { preHandler: requireAuth }, async (_request, reply) => {
     const promos = await fastify.prisma.promo.findMany({ orderBy: { label: "asc" } });
     const body: PromoSummary[] = promos.map((promo) => ({
@@ -15,8 +19,8 @@ export default async function promoRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * Création d'une promo. Avancé depuis la phase 9 (CRUD admin complet) pour débloquer l'upload
-   * en attendant l'interface d'administration : réservé admin/modérateur dès maintenant.
+   * Création d'une promo. Avancé depuis la phase 9 (CRUD admin complet) pour débloquer l'upload en
+   * attendant l'interface d'administration : réservé admin/modérateur dès maintenant.
    */
   fastify.post(
     "/promos",
@@ -89,8 +93,8 @@ export default async function promoRoutes(fastify: FastifyInstance) {
   );
 
   /**
-   * Suppression d'une promo (admin uniquement).
-   * Refusée si la promo a des documents pour éviter des orphelins.
+   * Suppression d'une promo (admin uniquement). Refusée si la promo a des documents pour éviter des
+   * orphelins.
    */
   fastify.delete(
     "/promos/:id",

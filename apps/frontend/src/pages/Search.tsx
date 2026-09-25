@@ -1,11 +1,12 @@
+import type { FileTypeCategory, PromoSummary, SearchResult } from "@docysen/types";
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import type { FileTypeCategory, PromoSummary, SearchResult } from "@docysen/types";
+
+import DocumentPreviewModal from "../components/DocumentPreviewModal";
+import DocumentThumbnail from "../components/DocumentThumbnail";
+import LikeButton from "../components/LikeButton";
 import { useAuth } from "../context/AuthContext";
 import { getPromos, getSubjects, searchDocuments, getLikes, toggleDocumentLike } from "../lib/api";
-import DocumentThumbnail from "../components/DocumentThumbnail";
-import DocumentPreviewModal from "../components/DocumentPreviewModal";
-import LikeButton from "../components/LikeButton";
 
 const FILE_TYPE_OPTIONS: { value: FileTypeCategory | ""; label: string }[] = [
   { value: "", label: "Tous types" },

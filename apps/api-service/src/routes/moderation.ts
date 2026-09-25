@@ -134,9 +134,13 @@ export default async function moderationRoutes(fastify: FastifyInstance) {
         }),
       ]);
 
-      // Document rejeté = ne sera jamais consulté : on libère l'espace sur Garage/S3 tout de
-      // suite plutôt que d'attendre un job de nettoyage.
-      const keysToDelete = [document.s3Key, document.thumbnailKey, document.previewKey].filter(
+      /**
+       * Document rejeté = ne sera jamais consulté : on libère l'espace sur Garage/S3 tout de suite
+       * plutôt que d'attendre un job de nettoyage. On lit sur `updated`, pas sur `document`, car le
+       * worker thumbnail peut avoir mis à jour ces clés entre-temps (avant que le modérateur ait
+       * statué)
+       */
+      const keysToDelete = [document.s3Key, updated.thumbnailKey, updated.previewKey].filter(
         (key): key is string => key !== null,
       );
       await Promise.all(

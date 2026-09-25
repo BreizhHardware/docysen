@@ -14,6 +14,10 @@
       "executor": "nx:run-commands",
       "options": { "command": "pnpm run test", "cwd": "apps/auth-service" }
     },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run test:coverage", "cwd": "apps/auth-service" }
+    },
     "docker-build": {
       "executor": "nx:run-commands",
       "options": { "command": "docker build -t docysen/auth-service .", "cwd": "apps/auth-service" }

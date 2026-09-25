@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { buildIsenEmail, parseAurionName } from "../src/aurion.js";
 
 describe("parseAurionName", () => {

@@ -1,7 +1,8 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ApiError, SESSION_EXPIRED_KEY } from "../lib/api";
+
 import { useAuth } from "../context/AuthContext";
+import { ApiError, SESSION_EXPIRED_KEY } from "../lib/api";
 
 function consumeSessionExpiredFlag(): boolean {
   const expired = sessionStorage.getItem(SESSION_EXPIRED_KEY) === "1";
@@ -34,7 +35,7 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-sidebar px-4">
+    <div className="bg-sidebar flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm rounded-lg bg-white p-8 shadow-xl">
         <div className="mb-8 flex flex-col items-center gap-2">
           <img
@@ -58,7 +59,7 @@ export default function Login() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+              className="focus:border-accent focus:ring-accent w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-1"
             />
           </div>
           <div>
@@ -72,7 +73,7 @@ export default function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+              className="focus:border-accent focus:ring-accent w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-1"
             />
           </div>
 
@@ -85,7 +86,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:opacity-60"
+            className="bg-accent hover:bg-accent-hover mt-2 rounded-md px-4 py-2 text-sm font-medium text-white transition disabled:opacity-60"
           >
             {loading ? "Connexion…" : "Se connecter"}
           </button>

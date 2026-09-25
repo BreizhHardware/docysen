@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
 import DOMPurify from "dompurify";
 import { marked } from "marked";
+import { useEffect, useState, useCallback } from "react";
+
 import { useAuth } from "../context/AuthContext";
 import { getPreviewUrl, toggleDocumentLike } from "../lib/api";
 
@@ -15,8 +16,8 @@ interface DocumentPreviewModalProps {
 const MARKDOWN_MIME_TYPES = new Set(["text/markdown", "text/x-markdown"]);
 
 /**
- * Consultation dans le navigateur (PDF, image, vidéo, DOCX/PPTX convertis en PDF, Markdown),
- * sans téléchargement préalable.
+ * Consultation dans le navigateur (PDF, image, vidéo, DOCX/PPTX convertis en PDF, Markdown), sans
+ * téléchargement préalable.
  */
 export default function DocumentPreviewModal({
   documentId,
@@ -92,15 +93,14 @@ export default function DocumentPreviewModal({
                   ? `Retirer « ${title} » des favoris`
                   : `Ajouter « ${title} » aux favoris`
               }
-              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition
-                    ${likedDocIds.has(documentId) ? "border-orange-300 bg-yellow-100 text-yellow-700 hover:bg-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"}`}
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition ${likedDocIds.has(documentId) ? "border-orange-300 bg-yellow-100 text-yellow-700 hover:bg-orange-100" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"}`}
             >
               <span>{likedDocIds.has(documentId) ? "⭐" : "★ Ajouter"}</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md px-2 py-1 text-slate-400 transition hover:bg-surface hover:text-slate-600"
+              className="hover:bg-surface rounded-md px-2 py-1 text-slate-400 transition hover:text-slate-600"
             >
               Fermer
             </button>
@@ -176,7 +176,7 @@ function PreviewBody({
       <p className="text-sm text-slate-500">
         Ce type de fichier ne peut pas être prévisualisé dans le navigateur.
       </p>
-      <a href={url} target="_blank" rel="noreferrer" className="text-sm font-medium text-accent">
+      <a href={url} target="_blank" rel="noreferrer" className="text-accent text-sm font-medium">
         Télécharger le fichier
       </a>
     </div>

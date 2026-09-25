@@ -1,6 +1,7 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { MAX_UPLOAD_SIZE_BYTES } from "@docysen/types";
 import type { PromoSummary } from "@docysen/types";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+
 import { useAuth } from "../context/AuthContext";
 import { confirmUpload, createDocument, getPromos, uploadToPresignedUrl } from "../lib/api";
 
@@ -182,19 +183,19 @@ export default function UploadDocument() {
             required
             type="file"
             onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-            className="text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-accent-light file:px-3 file:py-2 file:text-sm file:font-medium file:text-accent hover:file:bg-accent-light/80"
+            className="file:bg-accent-light file:text-accent hover:file:bg-accent-light/80 text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-2 file:text-sm file:font-medium"
           />
         </Field>
 
         {error && <p className="text-sm text-red-600">{error}</p>}
         {success && (
-          <p className="text-sm text-accent">Document déposé, en attente de modération.</p>
+          <p className="text-accent text-sm">Document déposé, en attente de modération.</p>
         )}
 
         <button
           type="submit"
           disabled={!canSubmit}
-          className="mt-2 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
+          className="bg-accent hover:bg-accent-hover mt-2 rounded-md px-4 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60"
         >
           {submitting ? "Envoi en cours..." : "Déposer"}
         </button>

@@ -20,5 +20,5 @@ body {
 
 /* Style d'input partagé entre les formulaires (voir ConsentEmailModal, UploadDocument). */
 .input {
-  @apply w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-accent focus:ring-1 focus:ring-accent;
+  @apply focus:border-accent focus:ring-accent w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-1;
 }

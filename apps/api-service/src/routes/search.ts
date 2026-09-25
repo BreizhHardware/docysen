@@ -1,7 +1,8 @@
-import type { FastifyInstance } from "fastify";
 import { SearchQuerySchema, type SearchResponse, type SearchResult } from "@docysen/types";
-import { requireAuth } from "../middleware/auth.js";
+import type { FastifyInstance } from "fastify";
+
 import { toDocumentSummaryWithThumbnail } from "../lib/documentSummary.js";
+import { requireAuth } from "../middleware/auth.js";
 import { DOCUMENTS_INDEX } from "../plugins/meilisearch.js";
 
 const DOCUMENT_INCLUDE = {
@@ -27,9 +28,9 @@ export default async function searchRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * Grille de résultats consultable par tout étudiant authentifié (pas
-   * réservé admin/modérateur, contrairement à /moderation) : seuls des documents `approved` sont
-   * indexés (voir lib/search.ts), donc aucun filtre de statut supplémentaire n'est nécessaire ici.
+   * Grille de résultats consultable par tout étudiant authentifié (pas réservé admin/modérateur,
+   * contrairement à /moderation) : seuls des documents `approved` sont indexés (voir
+   * lib/search.ts), donc aucun filtre de statut supplémentaire n'est nécessaire ici.
    */
   fastify.get("/search", { preHandler: requireAuth }, async (request, reply) => {
     const parseResult = SearchQuerySchema.safeParse(request.query);

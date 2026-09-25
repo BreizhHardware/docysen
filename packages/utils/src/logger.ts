@@ -1,6 +1,4 @@
-/**
- * Logger minimal partagé
- */
+/** Logger minimal partagé */
 export interface Logger {
   info(msg: string, meta?: Record<string, unknown>): void;
   warn(msg: string, meta?: Record<string, unknown>): void;

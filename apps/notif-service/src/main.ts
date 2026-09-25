@@ -1,5 +1,6 @@
-import { Worker } from "bullmq";
 import { RejectionEmailSchema } from "@docysen/types";
+import { Worker } from "bullmq";
+
 import { sendRejectionEmail } from "./email.js";
 import { env } from "./env.js";
 

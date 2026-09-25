@@ -8,6 +8,9 @@
     "test": {
       "cache": true
     },
+    "test:coverage": {
+      "cache": true
+    },
     "lint": {
       "cache": true
     },

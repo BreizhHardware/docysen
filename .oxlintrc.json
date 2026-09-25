@@ -9,7 +9,8 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/jsx-max-depth": "off",
-    "unicorn/filename-case": "off"
+    "unicorn/filename-case": "off",
+    "no-underscore-dangle": ["warn", { "allow": ["_count", "_sum"] }]
   },
   "env": {
     "builtin": true,

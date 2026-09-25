@@ -1,6 +1,7 @@
-import { config as loadEnv } from "dotenv";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { config as loadEnv } from "dotenv";
 import { defineConfig, env } from "prisma/config";
 
 // Le .env vit à la racine du monorepo

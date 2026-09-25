@@ -1,6 +1,7 @@
+import { JwtPayloadSchema, type JwtPayload, type UserRole } from "@docysen/types";
 import type { FastifyReply, FastifyRequest } from "fastify";
 import jwt from "jsonwebtoken";
-import { JwtPayloadSchema, type JwtPayload, type UserRole } from "@docysen/types";
+
 import { env } from "../env.js";
 
 declare module "fastify" {
@@ -26,8 +27,8 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
 }
 
 /**
- * À chaîner après `requireAuth`. Gestion des promos anticipée depuis la phase 9 (CRUD admin) :
- * en attendant l'interface d'administration complète, seuls admin/modérateur peuvent créer une promo.
+ * À chaîner après `requireAuth`. Gestion des promos anticipée depuis la phase 9 (CRUD admin) : en
+ * attendant l'interface d'administration complète, seuls admin/modérateur peuvent créer une promo.
  */
 export function requireRole(...roles: UserRole[]) {
   return async function (request: FastifyRequest, reply: FastifyReply) {

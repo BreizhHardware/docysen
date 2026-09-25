@@ -14,6 +14,10 @@
       "executor": "nx:run-commands",
       "options": { "command": "pnpm run test", "cwd": "apps/api-service" }
     },
+    "test:coverage": {
+      "executor": "nx:run-commands",
+      "options": { "command": "pnpm run test:coverage", "cwd": "apps/api-service" }
+    },
     "docker-build": {
       "executor": "nx:run-commands",
       "options": { "command": "docker build -t docysen/api-service .", "cwd": "apps/api-service" }
