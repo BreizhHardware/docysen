@@ -31,7 +31,13 @@ describe("env", () => {
   });
 
   it("charge et valide les variables d'environnement requises, avec les valeurs par défaut", async () => {
-    setEnv(REQUIRED_ENV);
+    setEnv({
+      ...REQUIRED_ENV,
+      API_SERVICE_PORT: undefined,
+      AWS_REGION: undefined,
+      S3_ENDPOINT: undefined,
+      REDIS_URL: undefined,
+    });
 
     const { env } = await import("../src/env.js");
 

@@ -5,7 +5,9 @@ import { config as loadDotenv } from "dotenv";
 import { z } from "zod";
 
 // Le .env vit à la racine du monorepo, pas dans chaque service.
-loadDotenv({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../.env") });
+if (process.env.VITEST !== "true") {
+  loadDotenv({ path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../.env") });
+}
 
 /**
  * Champs communs à tous les services Node. Chaque service étend ce schéma avec les variables qui
